@@ -18,11 +18,24 @@ import re
 import sys
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).parent.resolve()
+
+SEARCH_PATHS = [
+    Path(sys.argv[1]) if len(sys.argv) > 1 else None,  # explicit arg
+    Path.cwd() / "slide-templates.html",                # repo root (cwd)
+    SCRIPT_DIR.parent / "assets" / "slide-templates.html",  # bundled in skill
+    SCRIPT_DIR.parent.parent.parent / "slide-templates.html",  # scripts/→slidegen/→skills/→repo root
+]
+
 def main():
-    template_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("slide-templates.html")
-    if not template_path.exists():
-        print(f"Error: {template_path} not found.", file=sys.stderr)
-        print("Run from the SlideGen repo root, or pass the path as an argument.", file=sys.stderr)
+    template_path = next(
+        (p for p in SEARCH_PATHS if p is not None and p.exists()), None
+    )
+    if template_path is None:
+        print("Error: slide-templates.html not found.", file=sys.stderr)
+        print("Searched:", file=sys.stderr)
+        for p in SEARCH_PATHS[1:]:
+            print(f"  {p}", file=sys.stderr)
         sys.exit(1)
 
     html = template_path.read_text(encoding="utf-8")

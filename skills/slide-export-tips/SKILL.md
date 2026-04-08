@@ -25,7 +25,7 @@ Advise users on the best practices for printing or exporting BPDU HTML slide pre
     - **Advanced Tip:** Some BPDU decks include `@media print { .slide { position: static; opacity: 1; transform: none; display: block; break-after: page; } }` rules. Check the CSS for these rules.
 
 ## Design Reference
-Refer to `bp-debate-rules.html` for any `@media print` rules implemented.
+Check the target deck's `<style>` block for any existing `@media print` rules.
 - Ensure the `brand-bar` is `display: none` or `position: relative` for printing if it overlaps.
 - Hide `nav-btn`, `key-hint`, and `progress` bars.
 

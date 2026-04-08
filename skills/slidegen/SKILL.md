@@ -30,15 +30,16 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
 
 ### Bundled assets
 
-Brand images are bundled inside the skill so it works on any device or directory:
+Brand images are pre-encoded and bundled inside the skill — no script execution needed:
 
-- `assets/BPDU_LOGO.png` — the BPDU brain+lightning logo
-- `assets/BPDU_theme_image.png` — the illustrated group portrait
+- `assets/BPDU_LOGO.b64` — complete `data:image/png;base64,...` URI for the logo. Read this file and paste its entire contents as the `src` of every logo `<img>`.
+- `assets/BPDU_theme_image.b64` — complete `data:image/png;base64,...` URI for the illustration. Read and paste as the `src` of the `.illo img` and `.closing-illo img`.
+
+**How to use:** Read the file with the Read tool, then paste the full string as the `src` attribute. Do not call any script — the data URI is already computed.
 
 ### Available scripts
 
 - **`scripts/catalog.py`** — Parses `slide-templates.html` and prints a compact block catalog (ID, name, background, CSS classes).
-- **`scripts/embed-images.py`** — Encodes both brand images as base64 data URIs. Searches cwd first, then `skills/slidegen/assets/`, so it works both inside and outside the repo.
 
 ### Step 1 — get the block catalog
 
@@ -88,9 +89,9 @@ Use these layout classes to vary the presentation (all CSS is in `slide-template
 
 ### Mandatory Brand Bar HTML
 ```html
-<!-- Use the LOGO_URI data URI from embed-images.py as src — never a relative path -->
+<!-- src must be the full data URI read from assets/BPDU_LOGO.b64 — never a relative path -->
 <header class="brand-bar">
-  <img src="LOGO_URI_HERE" alt="BPDU">
+  <img src="data:image/png;base64,…(paste full contents of assets/BPDU_LOGO.b64 here)…" alt="BPDU">
   <span class="brand-bar-name">BP Debate Union</span>
   <span class="brand-bar-dot"></span>
   <span class="brand-bar-slide-tag" id="slideTag"></span>
@@ -148,14 +149,10 @@ document.addEventListener('touchend', e => {
 
 1. **Catalog** — run `python3 skills/slidegen/scripts/catalog.py` to see all 73 blocks.
 2. **Plan** — decide which blocks suit the topic and deck type; list them (e.g. A2 → B1 → C3 × 3 → D3).
-3. **Embed images** — run `python3 skills/slidegen/scripts/embed-images.py` and capture the output:
-   ```bash
-   python3 skills/slidegen/scripts/embed-images.py 2>/dev/null
-   # prints two lines:
-   # LOGO_URI=data:image/png;base64,...
-   # THEME_URI=data:image/png;base64,...
-   ```
-   Use the `LOGO_URI` value as the `src` of every `<img alt="BPDU">` in the brand bar and title slides. Use `THEME_URI` as the `src` of the illustration `<img>`. **Never use relative file paths** — the deck must open on any device without the original files.
+3. **Embed images** — read the pre-baked data URIs directly from the bundled asset files:
+   - Read `skills/slidegen/assets/BPDU_LOGO.b64` → paste its full contents as the `src` of every `<img alt="BPDU">` (brand bar + title slides).
+   - Read `skills/slidegen/assets/BPDU_theme_image.b64` → paste its full contents as the `src` of `.illo img` and `.closing-illo img`.
+   - **Never use relative file paths** — the deck must open on any device without external files.
 4. **Copy CSS** — read the relevant `<section>` elements from `slide-templates.html` and copy their CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
 5. **Write HTML** — build each `<section class="slide">` using the exact class names from the template. Annotate each slide's `data-tag` with a short label.
 6. **Wire JS** — use the navigation JS snippet verbatim (see below).

@@ -17,8 +17,9 @@ The skill automatically uses the `GEMINI_API_KEY` from your system environment. 
 
 | Model | Size Options | Notes |
 |-------|--------------|-------|
-| `gemini-2.5-flash-image` | 1K, 2K, 4K | Free tier, default. **512 not supported** |
-| `gemini-3.1-flash-image-preview` | 512, 1K, 2K, 4K | Preview model, supports smaller sizes |
+| `gemini-2.5-flash-image` | 1K, 2K, 4K | Default. **512 not supported** |
+| `gemini-3.1-flash-image-preview` | 512, 1K, 2K, 4K | Supports smaller sizes |
+| `gemini-3-pro-image-preview` | 1K, 2K, 4K | Highest quality; slower |
 
 Switch models using the `--model` flag:
 ```bash
@@ -68,7 +69,7 @@ Use this skill when:
 ## API Endpoint
 
 ```
-POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent
 Header: x-goog-api-key: $GEMINI_API_KEY
 ```
 
@@ -148,7 +149,7 @@ def generate_image(prompt: str, size: str = "1K", aspect_ratio: str = "16:9", ou
         print("Error: GEMINI_API_KEY not found in environment")
         sys.exit(1)
     
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     headers = {
         "x-goog-api-key": api_key,
         "Content-Type": "application/json"
@@ -201,6 +202,7 @@ if __name__ == "__main__":
     parser.add_argument("--aspect", "-a", default="16:9", choices=["1:1", "16:9", "9:16", "4:3", "3:2"])
     parser.add_argument("--output", "-o", default="generated.png")
     parser.add_argument("--image", "-i", default=None, help="Path to existing image for editing")
+    parser.add_argument("--model", "-m", default="gemini-2.5-flash-image", help="Model to use")
     
     args = parser.parse_args()
     
