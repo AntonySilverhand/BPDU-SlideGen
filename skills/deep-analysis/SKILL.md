@@ -115,10 +115,14 @@ STORY: [one vivid example that makes your case human and concrete]
 - The extension: a new stakeholder, dimension, or timeframe the opening bench cannot cover
 - How to validate the opening bench while adding genuine new material
 
+> Case cards are for *what* to argue. Position-specific tactical notes (speech structure, what to leave for the bench partner, how to handle the whip speech) belong in **3.6**, not here.
+
 ---
 
 ### LAYER 3 — DEEP ANALYSIS
 *For debaters with time to go deep. 8–10 minutes of reading.*
+
+**All six subsections (3.1 – 3.6) are mandatory in full-depth mode. Do not skip or merge any. Section 3.6 must appear as a standalone block — do not fold its content into the Layer 2 case cards.**
 
 #### 3.1 Definitional Analysis
 For each contested term:
@@ -168,6 +172,7 @@ Causal chain: Policy → [first-order] → [second-order] → [third-order]
 **Comparative verdict**: Which side's impacts are larger, and why — across each of the five dimensions. Name the winning weighing frame for Government and for Opposition.
 
 #### 3.6 Position-Specific Strategic Notes
+*This section is mandatory and must appear as a standalone block. Do not merge it into the case cards.*
 
 **OG must:**
 - Define fairly but strategically; have a defence ready for each term
