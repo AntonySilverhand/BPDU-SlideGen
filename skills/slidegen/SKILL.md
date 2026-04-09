@@ -31,13 +31,26 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
 ### Available scripts
 
 - **`scripts/catalog.py`** — Parses `slide-templates.html` and prints a compact block catalog (ID, name, background, CSS classes).
+- **`scripts/embed-images.py`** — Outputs `LOGO_URI=data:...` and `THEME_URI=data:...` lines for embedding brand images.
+
+### Locating the scripts
+
+The scripts may live in the repo (`skills/slidegen/scripts/`) or in the installed skill directory (`~/.claude/skills/slidegen/scripts/`). Resolve the correct path before running anything:
+
+```bash
+# Run once; use $SLIDEGEN the rest of the way
+if [ -f "skills/slidegen/scripts/catalog.py" ]; then
+  SLIDEGEN="skills/slidegen/scripts"
+else
+  SLIDEGEN="$HOME/.claude/skills/slidegen/scripts"
+fi
+echo "Using: $SLIDEGEN"
+```
 
 ### Step 1 — get the block catalog
 
-Run this from the repo root before generating any deck:
-
 ```bash
-python3 skills/slidegen/scripts/catalog.py
+python3 "$SLIDEGEN/catalog.py"
 ```
 
 Output columns: `ID · Block/Name · Background · CSS classes & notes`. Use this to pick which blocks to combine for the deck.
@@ -138,11 +151,12 @@ document.addEventListener('touchend', e => {
 
 ## Generation Workflow
 
-1. **Catalog** — run `python3 skills/slidegen/scripts/catalog.py` to see all 73 blocks.
-2. **Plan** — decide which blocks suit the topic and deck type; list them (e.g. A2 → B1 → C3 × 3 → D3).
-3. **Embed images** — run the embed script to get data URIs for both brand images:
+1. **Locate scripts** — resolve `$SLIDEGEN` using the path-detection block above (repo path first, installed path fallback).
+2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 73 blocks.
+3. **Plan** — decide which blocks suit the topic and deck type; list them (e.g. A2 → B1 → C3 × 3 → D3).
+4. **Embed images** — run the embed script to get data URIs for both brand images:
    ```bash
-   python3 skills/slidegen/scripts/embed-images.py
+   python3 "$SLIDEGEN/embed-images.py"
    ```
    The script outputs two lines:
    ```
@@ -153,10 +167,10 @@ document.addEventListener('touchend', e => {
    **Never use relative file paths** — the deck must open on any device without external files.
 
    > ⚠️ Do NOT read the `.b64` asset files directly with the Read tool — they are too large and will be truncated, resulting in broken images. Always use the embed script.
-4. **Copy CSS** — read the relevant `<section>` elements from `slide-templates.html` and copy their CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
-5. **Write HTML** — build each `<section class="slide">` using the exact class names from the template. Annotate each slide's `data-tag` with a short label.
-6. **Wire JS** — use the navigation JS snippet verbatim (see below).
-7. **Save** — write the file to the working directory with a descriptive name.
+5. **Copy CSS** — read the relevant `<section>` elements from `slide-templates.html` and copy their CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
+6. **Write HTML** — build each `<section class="slide">` using the exact class names from the template. Annotate each slide's `data-tag` with a short label.
+7. **Wire JS** — use the navigation JS snippet verbatim (see below).
+8. **Save** — write the file to the working directory with a descriptive name.
 
 ## Output
 Produce the complete HTML code for the requested presentation as a single file. Save it with a descriptive filename (e.g., `casefile-[motion-slug].html` for Case Files).
