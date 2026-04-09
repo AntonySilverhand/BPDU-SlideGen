@@ -57,7 +57,7 @@ Output columns: `ID · Block/Name · Background · CSS classes & notes`. Use thi
 
 ### Step 2 — read the relevant blocks from the template
 
-Once you know which blocks you need (e.g. A1 title, B1 stats, C3 argument cards), read the matching `<section>` elements from `slide-templates.html` for the exact HTML structure and any inline style overrides. Copy the markup verbatim and fill in content.
+Once you know which blocks you need (e.g. A1 title, B1 stats, C3 argument cards), read the matching `<section>` elements from `slide-templates.html` for the exact HTML structure and any inline style overrides. **Copy the markup verbatim and fill in content. The output HTML file must include the exact CSS class names from these blocks — do not hand-write slide layouts.**
 
 ### Block groups at a glance
 
@@ -154,19 +154,18 @@ document.addEventListener('touchend', e => {
 1. **Locate scripts** — resolve `$SLIDEGEN` using the path-detection block above (repo path first, installed path fallback).
 2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 73 blocks.
 3. **Plan** — decide which blocks suit the topic and deck type; list them (e.g. A2 → B1 → C3 × 3 → D3).
-4. **Embed images** — run the embed script to get data URIs for both brand images:
+4. **Embed images** — run the embed script to write data URIs to files:
    ```bash
    python3 "$SLIDEGEN/embed-images.py"
    ```
-   The script outputs two lines:
-   ```
-   LOGO_URI=data:image/png;base64,...
-   THEME_URI=data:image/png;base64,...
-   ```
-   Paste the `LOGO_URI` value as the `src` of every `<img alt="BPDU">` (brand bar + title slides). Paste the `THEME_URI` value as the `src` of `.illo img` and `.closing-illo img`.
+   This writes two files to the **current working directory** (not to stdout):
+   - `.logo_uri.txt` — full `data:image/png;base64,...` URI for the logo
+   - `.theme_uri.txt` — full `data:image/png;base64,...` URI for the illustration
+
+   Read **`.logo_uri.txt`** with the Read tool and paste its entire contents as the `src` of every `<img alt="BPDU">` (brand bar + title slides). Read **`.theme_uri.txt`** and paste as the `src` of `.illo img` and `.closing-illo img`.
    **Never use relative file paths** — the deck must open on any device without external files.
 
-   > ⚠️ Do NOT read the `.b64` asset files directly with the Read tool — they are too large and will be truncated, resulting in broken images. Always use the embed script.
+   > ⚠️ Do NOT pipe the script output through `head`, `tr`, or any other shell filter — the URIs are 330 KB and 2.4 MB respectively; any truncation breaks the images. Use the files, not stdout.
 5. **Copy CSS** — read the relevant `<section>` elements from `slide-templates.html` and copy their CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
 6. **Write HTML** — build each `<section class="slide">` using the exact class names from the template. Annotate each slide's `data-tag` with a short label.
 7. **Wire JS** — use the navigation JS snippet verbatim (see below).

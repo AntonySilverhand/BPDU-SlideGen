@@ -59,7 +59,7 @@ Then add the brand bar CSS from `CLAUDE.md` to the `<style>` block.
 
 **If it already exists:** Verify it has `position: fixed` in the CSS and that the logo `src` is a `data:` URI (not a relative path).
 
-**Logo URI:** Run `python3 skills/slidegen/scripts/embed-images.py` to get `LOGO_URI` and `THEME_URI`. Paste `LOGO_URI` as the logo `src`. **Do not read the `.b64` files with the Read tool — they are too large and will be truncated.**
+**Logo URI:** Run `python3 skills/slidegen/scripts/embed-images.py` — it writes `.logo_uri.txt` and `.theme_uri.txt` to the current working directory. Read those files with the Read tool and paste their contents as the logo `src`. **Do not pipe the script output through shell filters — truncation breaks the images.**
 
 ### Step 4 — Navigation JS
 

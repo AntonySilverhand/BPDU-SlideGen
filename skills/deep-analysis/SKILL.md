@@ -122,7 +122,7 @@ STORY: [one vivid example that makes your case human and concrete]
 ### LAYER 3 — DEEP ANALYSIS
 *For debaters with time to go deep. 8–10 minutes of reading.*
 
-**All six subsections (3.1 – 3.6) are mandatory in full-depth mode. Do not skip or merge any. Section 3.6 must appear as a standalone block — do not fold its content into the Layer 2 case cards.**
+**All six subsections (3.1 – 3.6) are mandatory in full-depth mode. Do not skip or merge any. Section 3.6 must appear as a standalone block — do not fold its content into the Layer 2 case cards. Section 3.4 is mandatory even for value/thr motions — use the same mechanism-analysis template but applied to the core value conflict.**
 
 #### 3.1 Definitional Analysis
 For each contested term:

@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-# /// script
-# dependencies = []
-# ///
 """
-embed-images.py — Output base64 data URIs for BPDU brand images.
+embed-images.py — Write base64 data URIs for BPDU brand images to files.
 
 Looks for images in this priority order:
   1. Repo root (cwd)  — BPDU_LOGO.png / BPDU_theme_image.png
@@ -13,12 +10,12 @@ Looks for images in this priority order:
 Usage (run from repo root):
   python3 skills/slidegen/scripts/embed-images.py
 
-Output: two shell-style variable lines, easy to read into a prompt or script:
-  LOGO_URI=data:image/png;base64,<...>
-  THEME_URI=data:image/png;base64,<...>
+Output files (written to cwd):
+  .logo_uri.txt  — the full LOGO_URI string (one line, no variable name prefix)
+  .theme_uri.txt — the full THEME_URI string (one line, no variable name prefix)
 
-The agent should paste these values as the `src` attribute of <img> tags in
-generated HTML so the deck works on any device without external files.
+This avoids stdout truncation for large base64 strings. Read both files with
+the Read tool and paste their contents as img src attributes.
 """
 
 import base64
@@ -63,14 +60,18 @@ def main():
             print(f"  {d}", file=sys.stderr)
         sys.exit(1)
 
-    print(f"# Source: {logo_path}", file=sys.stderr)
-    print(f"# Source: {theme_path}", file=sys.stderr)
-
     logo_uri  = encode(logo_path)
     theme_uri = encode(theme_path)
 
-    print(f"LOGO_URI={logo_uri}")
-    print(f"THEME_URI={theme_uri}")
+    logo_file  = Path.cwd() / ".logo_uri.txt"
+    theme_file = Path.cwd() / ".theme_uri.txt"
+
+    logo_file.write_text(logo_uri)
+    theme_file.write_text(theme_uri)
+
+    print(f"Logo URI written to: {logo_file.absolute()}  ({len(logo_uri):,} chars)", file=sys.stderr)
+    print(f"Theme URI written to: {theme_file.absolute()}  ({len(theme_uri):,} chars)", file=sys.stderr)
+    print("Paste the full contents of each file as the img src attribute.", file=sys.stderr)
 
 if __name__ == "__main__":
     main()
