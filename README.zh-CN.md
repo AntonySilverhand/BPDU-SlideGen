@@ -11,18 +11,20 @@
 | 技能 | 触发词 | 功能 |
 |------|--------|------|
 | `deep-analysis` | *"Analyze the motion..."* | 对 BP 辩题进行战略性多层分析（利益相关方、冲突点、论点） |
-| `slidegen` | *"Generate a slide deck on…"* | 根据主题或大纲生成带有品牌标识的单文件 HTML 演示 |
+| `slidegen` | *"Generate a slide deck on…"* | 生成带有品牌标识的单文件 HTML 演示、辩题资料包、活动主持稿或邀请函 |
 | `slide-theme` | *"Apply the BPDU theme to…"* | 将现有 HTML 演示更新为 BPDU 设计系统 |
 | `slide-export-tips` | *"How do I export this to PDF?"* | 提供 HTML 导出 PDF/打印的建议 |
 | `imagegen` | *"Generate an illustration for…"* | 通过 Gemini API 生成 BPDU 扁平卡通风格的插画 |
 
 ## 输出规格
 
-每份生成的演示都是**单个 `.html` 文件**，具备：
+每份生成的演示都是**单个 `.html` 文件**（约 20–80 KB），具备：
 - 键盘导航（`←` `→` `Space`）和触摸滑动
 - 幻灯片计数器与进度条
 - 每页固定 BPDU 品牌栏
-- 素材全嵌入（除 Google Fonts CDN 外无外部依赖）
+- 品牌图片从 `bpdebate.club` CDN 加载（需网络连接）
+
+> **v1.0.0 变更：** 图片现从托管 URL 加载，不再使用 base64 嵌入。文件体积缩小约 50 倍。如需离线使用，请运行 `embed-images.py` 的 base64 模式。
 
 ## 安装
 
@@ -97,6 +99,34 @@ python3 -m venv venv && source venv/bin/activate
 pip install requests
 ```
 
+## 脚本工具
+
+| 脚本 | 用途 |
+|------|------|
+| `scripts/embed-images.py` | 将品牌图片 URI 写入 `.logo_uri.txt` / `.theme_uri.txt`。默认模式编码 base64；使用 `--url` 获取 CDN 地址。 |
+| `scripts/validate.py` | 生成后验证：检查品牌栏、`.illo`、CONFIG、文件大小等。 |
+
+### 图片嵌入模式
+
+```bash
+# CDN 模式（v1.0+ 默认）— 文件保持约 20–80 KB
+python3 skills/slidegen/scripts/embed-images.py --url \
+  https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png \
+  https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png
+
+# Base64 模式 — 用于完全离线演示（约 2.7 MB）
+python3 skills/slidegen/scripts/embed-images.py
+```
+
+## 演示类型
+
+| 类型 | 适用场景 | 大小 |
+|------|----------|------|
+| **Reference（参考）** | 密集阅读材料、辩论规则 | 约 30–50 KB |
+| **Case File（辩题资料）** | 辩题简报、论点卡片、冲突分析 | 约 30–60 KB |
+| **Event Host（活动主持）** | 现场投影、每页一个要点、大字体 | 约 15–30 KB |
+| **Invitation / Email（邀请函）** | HTML 邮件邀请评委、嘉宾、参赛者 | 约 15–25 KB |
+
 ## 使用方法
 
 在 Claude Code 中描述你的需求即可调用任何技能：
@@ -110,11 +140,23 @@ Generate a case file deck on the motion "This House Would ban social media for u
 ```
 
 ```
+Generate an event host deck for our weekly round on May 23
+```
+
+```
+Generate a judge invitation email for the Bowen Cup tournament
+```
+
+```
 Generate an illustration of students debating, BPDU style, 16:9
 ```
 
 ```
 Apply the BPDU theme to my existing presentation.html
+```
+
+```
+Validate tmp/my-deck.html
 ```
 
 ## 设计系统
@@ -126,6 +168,26 @@ BPDU 视觉识别系统采用：
 - **正方 / 反方：** 蓝色 `#3B82F6` / 红色 `#EF4444`（BP 辩论惯例）
 
 完整规格见 [`CLAUDE.md`](./CLAUDE.md)。
+
+---
+
+## 更新日志
+
+### v1.0.0 — 2026-05-11
+
+- **CDN 优先图片：** 品牌素材现从 `bpdebate.club` URL 加载，不再使用 base64 嵌入。生成文件体积缩小约 50 倍（约 20–80 KB 对比约 2.7–5.3 MB）。
+- **`embed-images.py --url`：** 新增标志，将托管 URL 写入 `.logo_uri.txt` / `.theme_uri.txt`。base64 模式仍可用于离线场景。
+- **`validate.py`：** 新增生成后验证脚本。检查品牌栏、`.illo`/`.closing-illo`、Event Host 的 `CONFIG`、`.slide` 上无 `display:none`、文件大小合理性。
+- **Invitation Letter / Email 演示类型：** 新增品牌 HTML 邮件生成功能，用于邀请评委、嘉宾、参赛者。
+- **SKILL.md 加固：** 新增 `anti-triggers`、`allowed-tools`、`metadata`、负面约束和「完成前检查」验证清单。
+- **简化工作流：** 移除占位符 + 注入步骤。URL 直接写入生成的 HTML。
+- **批量修复现有文件：** 16 份现有 HTML 演示从 base64 更新为 URL。
+
+### v0.x — v1 之前
+
+- 初始技能集：`slidegen`、`deep-analysis`、`slide-theme`、`slide-export-tips`、`imagegen`。
+- Base64 嵌入品牌图片，实现完全自包含的离线演示。
+- 73 块模板库（`slide-templates.html`）。
 
 ---
 
