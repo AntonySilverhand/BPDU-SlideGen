@@ -176,6 +176,7 @@ Full spec in [`CLAUDE.md`](./CLAUDE.md).
 - **SKILL.md hardening:** Added `anti-triggers`, `allowed-tools`, `metadata`, negative constraints, and a "Before you finish" validation checklist.
 - **Simplified workflow:** Removed the placeholder + injection step. URLs are written directly into generated HTML.
 - **Batch-fixed existing files:** 16 existing HTML decks updated from base64 to URLs.
+- **Removed deprecated skills:** `slide-theme` and `slide-export-tips` are no longer maintained. Theme application is now built into `slidegen`; export advice is superseded by the validation workflow.
 
 ### v0.x — pre-v1
 

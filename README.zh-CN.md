@@ -176,6 +176,7 @@ BPDU 视觉识别系统采用：
 - **SKILL.md 加固：** 新增 `anti-triggers`、`allowed-tools`、`metadata`、负面约束和「完成前检查」验证清单。
 - **简化工作流：** 移除占位符 + 注入步骤。URL 直接写入生成的 HTML。
 - **批量修复现有文件：** 16 份现有 HTML 演示从 base64 更新为 URL。
+- **移除废弃技能：** `slide-theme` 和 `slide-export-tips` 不再维护。主题应用现已内置于 `slidegen`；导出建议由验证工作流替代。
 
 ### v0.x — v1 之前
 
