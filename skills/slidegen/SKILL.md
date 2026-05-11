@@ -1,6 +1,13 @@
 ---
 name: slidegen
-description: Generates a branded BPDU HTML slide deck based on a topic, motion, or outline.
+description: |
+  Generates a branded BPDU HTML slide deck, case file, event host deck, or invitation email.
+  Use when the user asks for slides, a presentation, a case file, an event host deck, or a BPDU-branded email invitation.
+  Do NOT use for plain text outlines, PDF generation, or non-BPDU-branded content.
+allowed-tools: Bash(python3 *), Read, Write
+metadata:
+  author: BP Debate Union
+  version: "1.0"
 ---
 
 # SlideGen: Branded HTML Slide Generator
@@ -23,7 +30,7 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
 - **Layout:** Use `clamp()` for all sizing. Generous whitespace (max 70% content width).
 - **Navigation:** Arrow keys + Spacebar. Touch swipe support. Slide counter (e.g., "3 / 12").
 - **Transitions:** `translateX` or `scale` based on deck type.
-- **Assets:** Always embed images as base64 data URIs (see workflow below) so the deck is fully self-contained and works on any device.
+- **Assets:** Brand images are loaded from hosted CDN URLs (`bpdebate.club`). The output HTML requires an internet connection to display images. For fully offline decks, use `embed-images.py` (base64 mode) instead.
 
 ## Template Library (canonical CSS + HTML source)
 
@@ -32,7 +39,7 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
 ### Available scripts
 
 - **`scripts/catalog.py`** — Parses `slide-templates.html` and prints a compact block catalog (ID, name, background, CSS classes).
-- **`scripts/embed-images.py`** — Outputs `LOGO_URI=data:...` and `THEME_URI=data:...` lines for embedding brand images.
+- **`scripts/embed-images.py`** — Writes image URIs to `.logo_uri.txt` / `.theme_uri.txt`. Default mode encodes local PNGs as base64 data URIs. Use `--url` to write hosted CDN URLs instead.
 
 ### Locating the scripts
 
@@ -151,7 +158,7 @@ Copy this skeleton verbatim and fill in the bracketed placeholders. All CSS must
   <tr>
     <td style="background:#fff; padding:28px 40px 20px; text-align:center;">
       <a href="https://bpdebate.club" style="text-decoration:none; display:inline-block;">
-        <img src="__LOGO_URI__" alt="BP Debate Union" width="48" height="48" style="display:inline-block; vertical-align:middle; border:0;">
+        <img src="https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png" alt="BP Debate Union" width="48" height="48" style="display:inline-block; vertical-align:middle; border:0;">
         <span style="display:inline-block; vertical-align:middle; margin-left:12px; font-size:20px; font-weight:700; color:#061425; letter-spacing:0.5px; text-transform:uppercase;">BP DEBATE UNION</span>
       </a>
     </td>
@@ -205,7 +212,7 @@ Copy this skeleton verbatim and fill in the bracketed placeholders. All CSS must
   <!-- Theme illustration -->
   <tr>
     <td style="padding:0 40px 28px; text-align:center;">
-      <img src="__THEME_URI__" alt="BP Debate Union" width="400" style="display:block; margin:0 auto; max-width:100%; height:auto; border-radius:8px;">
+      <img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png" alt="BP Debate Union" width="400" style="display:block; margin:0 auto; max-width:100%; height:auto; border-radius:8px;">
     </td>
   </tr>
 
@@ -257,17 +264,6 @@ When the invitation includes an event schedule, insert this table markup inside 
 </table>
 ```
 
-### Image handling for emails
-
-Unlike slide decks, HTML emails **should not rely on base64 data URIs for delivery** — many email clients (Gmail, Outlook) block or strip them. Instead, follow the same placeholder workflow, then replace with hosted URLs before sending:
-
-1. Run the embed script to produce `.logo_uri.txt` and `.theme_uri.txt`.
-2. Write the email HTML with `__LOGO_URI__` and `__THEME_URI__` placeholders.
-3. After injection, if the email will be sent through an ESP or Mailchimp/SendGrid, **swap the base64 strings for reliable `https://` CDN URLs** (e.g. hosted on `bpdebate.club`).
-4. Keep the base64 version for offline drafts or local previews.
-
-> ⚠️ **Never paste multi-megabyte base64 strings directly into the email markup during editing.** Use placeholders and inject only at the final step.
-
 ### Output
 Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[event]-[role].html`.
 
@@ -277,11 +273,17 @@ Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[eve
 - **Event Host**: Projection-ready, massive text (`.hero`), alternating backgrounds, live event features.
 - **Meet the Teachers**: Public-facing guest event style. Blends theatrical projection with informative biographies and concept breakdowns.
 
+### Negative Constraints (do NOT do these)
+- Do NOT use `display:none` for slides — it breaks transitions.
+- Do NOT invent new CSS class names. Copy verbatim from `slide-templates.html`.
+- Do NOT skip Step 0e (adversarial critique) for Case File or Reference decks.
+- Do NOT paste multi-megabyte base64 inline during editing — use hosted URLs or the embed script.
+- Do NOT save generated files to the repo root — always use `tmp/`.
+
 ### Mandatory Brand Bar HTML
 ```html
-<!-- src must be the full data URI from: python3 skills/slidegen/scripts/embed-images.py → LOGO_URI — never a relative path -->
 <header class="brand-bar">
-  <img src="data:image/png;base64,…(paste full contents of assets/BPDU_LOGO.b64 here)…" alt="BPDU">
+  <img src="https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png" alt="BPDU">
   <span class="brand-bar-name">BP Debate Union</span>
   <span class="brand-bar-dot"></span>
   <span class="brand-bar-slide-tag" id="slideTag"></span>
@@ -432,57 +434,34 @@ After revisions, the brief is locked. All `.arg` card content, pull quotes, clas
 1. **Locate scripts** — resolve `$SLIDEGEN` using the path-detection block above (repo path first, installed path fallback).
 2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 73 blocks.
 3. **Plan** — decide which blocks suit the topic and deck type; list them (e.g. A2 → B1 → C3 × 3 → D3). For Case File / Reference decks, map each brief argument to a specific block.
-4. **Embed images** — run the embed script to write data URIs to files:
-   ```bash
-   python3 "$SLIDEGEN/embed-images.py"
-   ```
-   This writes two files to the **current working directory** (not to stdout):
-   - `.logo_uri.txt` — full `data:image/png;base64,...` URI for the logo
-   - `.theme_uri.txt` — full `data:image/png;base64,...` URI for the illustration
+4. **Copy CSS** — read the relevant `<section>` elements from `slide-templates.html` and copy their CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
+5. **Write HTML** — build each `<section class="slide">` using the exact class names from the template. Annotate each slide's `data-tag` with a short label.
 
-   > ⚠️ **Never paste the URI contents inline into the HTML.** The logo is 330 KB and the theme image is 2.4 MB of base64 — any attempt to copy-paste them will silently truncate the data and break the images. Use placeholders instead (see step 6).
+   Use the **hosted CDN URLs** directly as `src` values:
+   - `https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png` for every `<img>` that should show the BPDU logo (brand bar + title/closing slides)
+   - `https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png` for every `.illo img` and `.closing-illo img`
 
-   > ⚠️ **Never use the Read tool on `.png` files** (`BPDU_LOGO.png`, `BPDU_theme_image.png`). The Read tool sends PNG files to the API as image content blocks, which will cause a fatal "Could not process image" error. All image handling goes through the scripts — never touch the raw PNG files directly.
-
-5. **Copy CSS** — read the relevant `<section>` elements from `slide-templates.html` and copy their CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
-6. **Write HTML** — build each `<section class="slide">` using the exact class names from the template. Annotate each slide's `data-tag` with a short label.
-
-   Use these exact placeholder strings as `src` values — **do not substitute real base64 here**:
-   - `__LOGO_URI__` for every `<img>` that should show the BPDU logo (brand bar + title/closing slides)
-   - `__THEME_URI__` for every `.illo img` and `.closing-illo img`
-
-   > ⚠️ **Mandatory:** the title slide MUST contain a `.illo` div and the closing slide MUST contain a `.closing-illo` div, each with an `<img src="__THEME_URI__">`. If these elements are absent, the theme image will never be injected and the file will be ~360 KB instead of ~2.7 MB — a silent failure. Always verify both are present before saving.
+   > ⚠️ **Mandatory:** the title slide MUST contain a `.illo` div and the closing slide MUST contain a `.closing-illo` div, each with an `<img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png">`. If these elements are absent, the theme image will be missing — a silent failure. Always verify both are present before saving.
 
    Required markup (must appear verbatim in the output):
    ```html
    <!-- in brand bar and title/closing slides: -->
-   <img src="__LOGO_URI__" alt="BPDU">
+   <img src="https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png" alt="BPDU">
 
    <!-- in title slide inner row: -->
-   <div class="illo"><img src="__THEME_URI__" alt=""></div>
+   <div class="illo"><img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png" alt=""></div>
 
    <!-- in closing slide: -->
-   <div class="closing-illo"><img src="__THEME_URI__" alt=""></div>
+   <div class="closing-illo"><img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png" alt=""></div>
    ```
 
-7. **Wire JS** — use the navigation JS snippet verbatim (see below).
-8. **Save** — write the file to the `tmp/` directory with a descriptive name (e.g. `tmp/casefile-[slug].html`). Never save to the repo root.
-9. **Inject images** — after saving, run this one-liner to substitute the placeholders with the real URIs:
+6. **Wire JS** — use the navigation JS snippet verbatim (see below).
+7. **Save** — write the file to the `tmp/` directory with a descriptive name (e.g. `tmp/casefile-[slug].html`). Never save to the repo root.
+8. **Validate** — run the validation script on the output file:
    ```bash
-   python3 - <<'PYEOF'
-   import re, pathlib
-   logo  = pathlib.Path('.logo_uri.txt').read_text().strip()
-   theme = pathlib.Path('.theme_uri.txt').read_text().strip()
-   p = pathlib.Path('OUTPUT_FILENAME.html')
-   html = p.read_text()
-   html = html.replace('__LOGO_URI__', logo).replace('__THEME_URI__', theme)
-   p.write_text(html)
-   print(f"Done — {len(html)//1024} KB")
-   PYEOF
+   python3 "$SLIDEGEN/validate.py" tmp/OUTPUT_FILENAME.html
    ```
-   Replace `OUTPUT_FILENAME.html` with the actual filename. The file size should jump to ~2.7 MB confirming both images are fully embedded.
-
-   > ⚠️ **If the file stays ~360 KB after injection**, the `.illo` or `.closing-illo` elements were missing from the HTML. Go back, add them to the title and closing slides with `__THEME_URI__` as the src, re-save, and re-run the inject script.
+   Fix any FAIL or WARN before returning the result to the user.
 
 ## Output
 Produce the complete HTML code for the requested presentation or email as a single file. Save it to `tmp/` with a descriptive filename:
@@ -491,3 +470,15 @@ Produce the complete HTML code for the requested presentation or email as a sing
 - Invitation Letters: `tmp/invite-[event]-[role].html`
 
 > ⚠️ **Never run any git commands.** Do not commit, stage, push, or modify git history at any point. Git operations are exclusively the user's responsibility.
+
+---
+
+## Validation Checklist (run before returning output)
+
+1. [ ] File saved to `tmp/` (never repo root)
+2. [ ] Brand bar (`<header class="brand-bar">`) exists in the HTML
+3. [ ] Title slide contains `.illo` div with `<img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png">`
+4. [ ] Closing slide contains `.closing-illo` div with `<img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png">`
+5. [ ] For Event Host decks: `CONFIG` object exists at top of `<script>`
+6. [ ] No `display:none` used on `.slide` elements
+7. [ ] `validate.py` reports PASS (or only WARN for non-critical issues)
