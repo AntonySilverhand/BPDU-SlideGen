@@ -11,18 +11,20 @@ Think PowerPoint, but in HTML — fully keyboard-navigable, no build step, singl
 | Skill | Trigger | What it does |
 |-------|---------|--------------|
 | `deep-analysis` | *"Analyze the motion..."* | Strategic, layered analysis of a BP motion (stakeholders, clashes, cases) |
-| `slidegen` | *"Generate a slide deck on…"* | Produces a branded, single-file HTML presentation from a topic or outline |
+| `slidegen` | *"Generate a slide deck on…"* | Produces a branded, single-file HTML presentation, case file, event host deck, or invitation email |
 | `slide-theme` | *"Apply the BPDU theme to…"* | Updates an existing HTML deck to match the BPDU design system |
 | `slide-export-tips` | *"How do I export this to PDF?"* | Advises on printing / PDF export from generated HTML |
 | `imagegen` | *"Generate an illustration for…"* | Creates or edits images via the Gemini API in the BPDU flat-cartoon style |
 
 ## Output
 
-Every generated deck is a **single `.html` file** with:
+Every generated deck is a **single `.html` file** (~20–80 KB) with:
 - Keyboard navigation (`←` `→` `Space`) and touch swipe
 - Slide counter and progress bar
 - Fixed BPDU brand bar on every slide
-- Fully embedded assets (no external dependencies beyond Google Fonts CDN)
+- Brand images loaded from `bpdebate.club` CDN (internet connection required)
+
+> **v1.0.0 change:** Images are now loaded from hosted URLs instead of being base64-embedded. Files are ~50× smaller. For offline use, run `embed-images.py` in base64 mode.
 
 ## Installation
 
@@ -97,6 +99,34 @@ python3 -m venv venv && source venv/bin/activate
 pip install requests
 ```
 
+## Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/embed-images.py` | Writes brand image URIs to `.logo_uri.txt` / `.theme_uri.txt`. Default mode encodes base64; use `--url` for CDN URLs. |
+| `scripts/validate.py` | Post-generation validation: checks brand bar, `.illo`, `CONFIG`, file size, etc. |
+
+### Image embedding modes
+
+```bash
+# CDN mode (default, v1.0+) — files stay ~20–80 KB
+python3 skills/slidegen/scripts/embed-images.py --url \
+  https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png \
+  https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png
+
+# Base64 mode — for fully offline decks (~2.7 MB)
+python3 skills/slidegen/scripts/embed-images.py
+```
+
+## Deck Types
+
+| Type | Best for | Size |
+|------|----------|------|
+| **Reference** | Dense reading material, debate rules | ~30–50 KB |
+| **Case File** | Motion briefing, argument cards, clash analysis | ~30–60 KB |
+| **Event Host** | Live projection, one idea per slide, massive text | ~15–30 KB |
+| **Invitation / Email** | HTML email invites for panelists, judges, guests | ~15–25 KB |
+
 ## Usage
 
 Invoke any skill by describing what you want in the Claude Code prompt:
@@ -110,11 +140,23 @@ Generate a case file deck on the motion "This House Would ban social media for u
 ```
 
 ```
+Generate an event host deck for our weekly round on May 23
+```
+
+```
+Generate a judge invitation email for the Bowen Cup tournament
+```
+
+```
 Generate an illustration of students debating, BPDU style, 16:9
 ```
 
 ```
 Apply the BPDU theme to my existing presentation.html
+```
+
+```
+Validate tmp/my-deck.html
 ```
 
 ## Design System
@@ -126,6 +168,26 @@ The BPDU visual identity uses:
 - **Government / Opposition:** Blue `#3B82F6` / Red `#EF4444` (BP debate convention)
 
 Full spec in [`CLAUDE.md`](./CLAUDE.md).
+
+---
+
+## Changelog
+
+### v1.0.0 — 2026-05-11
+
+- **CDN-first images:** Brand assets now load from `bpdebate.club` URLs instead of base64 embedding. Generated files are ~50× smaller (~20–80 KB vs ~2.7–5.3 MB).
+- **`embed-images.py --url`:** New flag to write hosted URLs to `.logo_uri.txt` / `.theme_uri.txt`. Base64 mode still available for offline use.
+- **`validate.py`:** New post-generation validation script. Checks brand bar, `.illo`/`.closing-illo`, `CONFIG` for event decks, no `display:none` on `.slide`, and file size sanity.
+- **Invitation Letter / Email deck type:** Added branded HTML email generation for panelist/judge/participant invites.
+- **SKILL.md hardening:** Added `anti-triggers`, `allowed-tools`, `metadata`, negative constraints, and a "Before you finish" validation checklist.
+- **Simplified workflow:** Removed the placeholder + injection step. URLs are written directly into generated HTML.
+- **Batch-fixed existing files:** 16 existing HTML decks updated from base64 to URLs.
+
+### v0.x — pre-v1
+
+- Initial skill set with `slidegen`, `deep-analysis`, `slide-theme`, `slide-export-tips`, and `imagegen`.
+- Base64-embedded brand images for fully self-contained offline decks.
+- 73-block template library (`slide-templates.html`).
 
 ---
 
