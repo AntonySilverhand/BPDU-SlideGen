@@ -12,8 +12,6 @@ Think PowerPoint, but in HTML — fully keyboard-navigable, no build step, singl
 |-------|---------|--------------|
 | `deep-analysis` | *"Analyze the motion..."* | Strategic, layered analysis of a BP motion (stakeholders, clashes, cases) |
 | `slidegen` | *"Generate a slide deck on…"* | Produces a branded, single-file HTML presentation, case file, event host deck, or invitation email |
-| `slide-theme` | *"Apply the BPDU theme to…"* | Updates an existing HTML deck to match the BPDU design system |
-| `slide-export-tips` | *"How do I export this to PDF?"* | Advises on printing / PDF export from generated HTML |
 | `imagegen` | *"Generate an illustration for…"* | Creates or edits images via the Gemini API in the BPDU flat-cartoon style |
 
 ## Output
@@ -149,10 +147,6 @@ Generate a judge invitation email for the Bowen Cup tournament
 
 ```
 Generate an illustration of students debating, BPDU style, 16:9
-```
-
-```
-Apply the BPDU theme to my existing presentation.html
 ```
 
 ```

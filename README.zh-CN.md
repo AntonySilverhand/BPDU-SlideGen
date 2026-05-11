@@ -12,8 +12,6 @@
 |------|--------|------|
 | `deep-analysis` | *"Analyze the motion..."* | 对 BP 辩题进行战略性多层分析（利益相关方、冲突点、论点） |
 | `slidegen` | *"Generate a slide deck on…"* | 生成带有品牌标识的单文件 HTML 演示、辩题资料包、活动主持稿或邀请函 |
-| `slide-theme` | *"Apply the BPDU theme to…"* | 将现有 HTML 演示更新为 BPDU 设计系统 |
-| `slide-export-tips` | *"How do I export this to PDF?"* | 提供 HTML 导出 PDF/打印的建议 |
 | `imagegen` | *"Generate an illustration for…"* | 通过 Gemini API 生成 BPDU 扁平卡通风格的插画 |
 
 ## 输出规格
@@ -149,10 +147,6 @@ Generate a judge invitation email for the Bowen Cup tournament
 
 ```
 Generate an illustration of students debating, BPDU style, 16:9
-```
-
-```
-Apply the BPDU theme to my existing presentation.html
 ```
 
 ```
