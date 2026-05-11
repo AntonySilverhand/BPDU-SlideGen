@@ -13,6 +13,7 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
     1. **Reference** (Default): Dense, card-heavy, for reading.
     2. **Case File**: Briefing style, dark accents, focused on a specific motion.
     3. **Event Host**: Projection-ready, massive text, alternating backgrounds, live event features.
+    4. **Invitation Letter / Email**: Branded HTML email for inviting guests, panelists, judges, or participants to a BPDU event.
 - **Outline (Optional):** Specific points or slides requested.
 
 ## Design Requirements
@@ -85,6 +86,191 @@ Use these layout classes to vary the presentation (all CSS is in `slide-template
 - **Teacher Card**: `.teacher-card` (flex-row) with `.teacher-img` (left) and `.teacher-info` (right). For guest bios.
 - **Motion Anatomy**: `.motion-anatomy` grid of `.term-card` elements. Breaks down motion definitions for the public.
 
+## Print Poster / Flyer Templates
+
+The following A4 print-ready HTML poster/flyer templates are available as canonical reference for event promotion materials. These are **not** slide decks — they are single-page (or multi-page), self-contained HTML files designed for A4 printing (`794px × 1123px`).
+
+### Bowen Cup flyer design system
+
+- **Dimensions:** A4 portrait, `width: 794px; height: 1123px;`
+- **Background:** Warm cream `#FDF8EB`
+- **Primary accent:** Amber `#FFC542`
+- **Secondary accent:** Teal `#A2D2DF`
+- **Typography:** Bilingual — English primary with Chinese secondary (`opacity: 0.85; font-size: 0.68rem;`)
+- **Layout:** Card-based with generous rounded corners, subtle shadows, and geometric accent shapes
+- **Assets:** All images embedded as base64 data URIs for full self-containment
+
+### Available templates
+
+| File | Path | Description |
+|------|------|-------------|
+| **Bowen Cup — Full** | `/home/antony/coding/BP Debate Union/Bowen Cup/bowen_cup_flyer.html` | Original version with front page, back page, and sponsors poster (3 pages). Contains full event info, QR codes, schedule, and participation guidelines. |
+| **Bowen Cup — Clean** | `/home/antony/coding/BP Debate Union/Bowen Cup/bowen_cup_flyer_clean.html` | Streamlined 2-page version (front + back only, no sponsors page). Use when sponsor information is not needed. |
+| **Bowen Cup — SCGK** | `/home/antony/coding/BP Debate Union/Bowen Cup/bowen_cup_flyer_scgk.html` | Front and back variant with "scgk" (仕呈公考) sponsor branding. Use when this specific sponsor is involved. |
+
+When generating new event flyers or posters, read the relevant template file first to copy its CSS tokens, layout patterns, and bilingual text styling verbatim. Do not invent new class names for poster layouts.
+
+## Invitation Letter / Email Templates
+
+Branded HTML emails for inviting panelists, judges, guests, or participants to BPDU events. Designed for maximum compatibility across email clients using **table-based layout with inline CSS**.
+
+### Design system
+
+| Element | Specification |
+|---|---|
+| **Width** | `600px` centered card inside a full-width outer table |
+| **Outer background** | `#f5f0e6` (warm cream) |
+| **Card background** | `#ffffff` |
+| **Primary accent** | `#ffc62a` (amber) — top bar, divider, signature border |
+| **Text primary** | `#061425` (dark navy) |
+| **Text secondary** | `#261e40` (muted navy) |
+| **Typography** | `'Varela Round'`, system-ui, sans-serif; body `15px`, line-height `1.75` |
+| **Card shadow** | `0 2px 16px rgba(6,20,37,0.06)` |
+
+### Canonical structure
+
+Copy this skeleton verbatim and fill in the bracketed placeholders. All CSS must remain inline — never use `<style>` blocks or external stylesheets for email output.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[Event Name] — [Invitation Type]</title>
+</head>
+<body style="margin:0; padding:0; background:#f5f0e6; font-family:'Varela Round',system-ui,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f0e6; padding:40px 0;">
+<tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#fff; overflow:hidden; box-shadow:0 2px 16px rgba(6,20,37,0.06);">
+
+  <!-- Amber accent bar -->
+  <tr><td style="background:#ffc62a; height:4px; font-size:0; line-height:0;">&nbsp;</td></tr>
+
+  <!-- Header with logo -->
+  <tr>
+    <td style="background:#fff; padding:28px 40px 20px; text-align:center;">
+      <a href="https://bpdebate.club" style="text-decoration:none; display:inline-block;">
+        <img src="__LOGO_URI__" alt="BP Debate Union" width="48" height="48" style="display:inline-block; vertical-align:middle; border:0;">
+        <span style="display:inline-block; vertical-align:middle; margin-left:12px; font-size:20px; font-weight:700; color:#061425; letter-spacing:0.5px; text-transform:uppercase;">BP DEBATE UNION</span>
+      </a>
+    </td>
+  </tr>
+
+  <!-- Gold divider -->
+  <tr><td style="padding:0 40px;"><div style="border-bottom:3px solid #ffc62a; width:60px; margin:0 auto;"></div></td></tr>
+
+  <!-- Event title -->
+  <tr>
+    <td style="padding:24px 40px 8px; text-align:center;">
+      <div style="font-size:26px; font-weight:700; color:#061425; letter-spacing:0.5px;">[Event Name]</div>
+      <div style="font-size:13px; color:#261e40; margin-top:6px; letter-spacing:2px; text-transform:uppercase;">[Invitation Type]</div>
+    </td>
+  </tr>
+
+  <!-- Body -->
+  <tr>
+    <td style="padding:28px 40px 16px;">
+      <p style="margin:0 0 18px; font-size:15px; color:#061425; line-height:1.75;">Dear [Recipient Name],</p>
+      <p style="margin:0 0 18px; font-size:15px; color:#061425; line-height:1.75;">[Opening paragraph — context + invitation ask]</p>
+      <!-- Optional: schedule table or extra details -->
+    </td>
+  </tr>
+
+  <!-- Closing -->
+  <tr>
+    <td style="padding:0 40px 32px;">
+      <p style="margin:0 0 18px; font-size:15px; color:#061425; line-height:1.75;">[Closing paragraph — gratitude + next steps]</p>
+      <p style="margin:0 0 4px; font-size:15px; color:#061425; line-height:1.75;">Best regards,</p>
+    </td>
+  </tr>
+
+  <!-- Signature -->
+  <tr>
+    <td style="padding:0 40px 28px;">
+      <table role="presentation" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="border-left:3px solid #ffc62a; padding-left:16px;">
+            <div style="font-size:16px; font-weight:700; color:#061425;">[Sender Name]</div>
+            <div style="font-size:13px; color:#261e40; margin-top:2px;">[Title], BP Debate Union</div>
+            <div style="font-size:13px; color:#261e40; margin-top:4px;">
+              <a href="mailto:team@bpdebate.club" style="color:#061425; text-decoration:underline;">team@bpdebate.club</a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Theme illustration -->
+  <tr>
+    <td style="padding:0 40px 28px; text-align:center;">
+      <img src="__THEME_URI__" alt="BP Debate Union" width="400" style="display:block; margin:0 auto; max-width:100%; height:auto; border-radius:8px;">
+    </td>
+  </tr>
+
+  <!-- Footer -->
+  <tr>
+    <td style="background:#061425; padding:20px 40px; text-align:center;">
+      <a href="https://bpdebate.club" style="color:#ffc62a; font-size:12px; text-decoration:none; letter-spacing:1px;">bpdebate.club</a>
+      <div style="font-size:11px; color:#999; margin-top:6px;">Where logic clashes, minds meet, ideas matter...</div>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>
+```
+
+### Variable placeholders
+
+| Placeholder | Source / Example |
+|---|---|
+| `[Event Name]` | e.g. "Bowen Cup II" |
+| `[Invitation Type]` | e.g. "Panelist Invitation", "Judge Invitation", "Participant Welcome" |
+| `[Recipient Name]` | e.g. "Professor Daniel" |
+| `[Opening paragraph]` | Context + specific ask |
+| `[Closing paragraph]` | Gratitude, logistics, or call-to-action |
+| `[Sender Name]` | e.g. "Antony" |
+| `[Title]` | e.g. "President" |
+
+### Schedule table (optional)
+
+When the invitation includes an event schedule, insert this table markup inside the body cell:
+
+```html
+<p style="margin:0 0 24px; font-size:15px; color:#061425; line-height:1.75;">The tournament schedule is as follows:</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; border:2px solid #061425;">
+  <tr>
+    <th style="background:#061425; color:#fff; padding:10px 16px; font-size:13px; text-align:left; font-weight:600;">Time</th>
+    <th style="background:#061425; color:#fff; padding:10px 16px; font-size:13px; text-align:left; font-weight:600;">Activity</th>
+    <th style="background:#061425; color:#fff; padding:10px 16px; font-size:13px; text-align:left; font-weight:600;">Notes</th>
+  </tr>
+  <tr>
+    <td style="padding:10px 16px; font-size:14px; color:#061425; border-bottom:1px solid #e8e4da;"><strong>09:00 – 11:00</strong></td>
+    <td style="padding:10px 16px; font-size:14px; color:#061425; border-bottom:1px solid #e8e4da;">Round 1</td>
+    <td style="padding:10px 16px; font-size:14px; color:#061425; border-bottom:1px solid #e8e4da;">Opening round</td>
+  </tr>
+  <!-- stripe alternate rows with background:#fefbf3 -->
+</table>
+```
+
+### Image handling for emails
+
+Unlike slide decks, HTML emails **should not rely on base64 data URIs for delivery** — many email clients (Gmail, Outlook) block or strip them. Instead, follow the same placeholder workflow, then replace with hosted URLs before sending:
+
+1. Run the embed script to produce `.logo_uri.txt` and `.theme_uri.txt`.
+2. Write the email HTML with `__LOGO_URI__` and `__THEME_URI__` placeholders.
+3. After injection, if the email will be sent through an ESP or Mailchimp/SendGrid, **swap the base64 strings for reliable `https://` CDN URLs** (e.g. hosted on `bpdebate.club`).
+4. Keep the base64 version for offline drafts or local previews.
+
+> ⚠️ **Never paste multi-megabyte base64 strings directly into the email markup during editing.** Use placeholders and inject only at the final step.
+
+### Output
+Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[event]-[role].html`.
+
 ## Deck Types
 - **Reference**: Dense, reading-oriented, card-heavy.
 - **Case File**: Briefing style, dark accents, argument cards with `.arg::before`.
@@ -149,11 +335,103 @@ document.addEventListener('touchend', e => {
 });
 ```
 
+## Phase 0 — Research & Content Brief
+
+**Required for Case File and Reference decks. Skip for Event Host.**
+
+This phase runs entirely in text — no HTML, no templates. Its output is a validated content brief that all slide content must be drawn from. Do not skip or abbreviate it; shallow briefs produce shallow slides.
+
+### Step 0a — Check local knowledge base
+
+Before any web search, check whether the local debate database is available:
+
+```bash
+python3 db/query.py stats 2>/dev/null && echo "DB_AVAILABLE" || echo "DB_MISSING"
+```
+
+**If `DB_AVAILABLE`:** query it for existing analyses and motions related to the topic before going to the web. Use these commands:
+
+```bash
+# Full-text search for related motions
+python3 db/query.py search "[topic keyword]"
+
+# Pull existing analyses for any matching motion IDs found above
+python3 db/query.py motion [ID]
+
+# Broader analysis search by motion text fragment
+python3 db/query.py analysis "[topic keyword]"
+
+# Search speech transcripts for real examples
+python3 db/query.py transcripts "[topic keyword]"
+```
+
+Record any arguments, framings, or evidence found in the DB. These count as validated debate-community sources — treat them as a first-draft skeleton for the brief. Note which motion IDs they came from.
+
+**If the DB returns no results** for any query: note that the topic has no prior coverage in the knowledge base, then proceed directly to Step 0c web searches. Do not spend more than 2 additional queries trying alternate keywords — absence of DB data is not a problem, just proceed.
+
+**If `DB_MISSING`:** skip this step and proceed directly to Step 0b.
+
+### Step 0b — Decompose the motion
+
+Write out:
+- **Motion text** (exact wording)
+- **Key terms** — define each contested word; note which definition favours which side
+- **Status quo** — what is currently true / what policy currently exists
+- **Burden** — what Government must prove; what Opposition must prove
+- **Assumed stakeholders** — who is most affected and why they matter
+
+### Step 0c — Web search for evidence
+
+Run at least **6 searches** covering all four team positions. Required search targets:
+
+| Search target | Example query |
+|---|---|
+| Empirical evidence supporting the motion | `"[topic]" study statistics harm benefit site:scholar OR site:gov OR site:org` |
+| Empirical evidence against the motion | `"[topic]" criticism failure unintended consequences research` |
+| Real-world jurisdiction or case | `country OR city "[topic]" policy implemented results` |
+| Named scholar or critic | `professor researcher "[topic]" argues OR claims OR warns` |
+| Quantified impact | `"[topic]" percent OR million OR billion data report` |
+| Recent news or development | `"[topic]" 2023 OR 2024 OR 2025` |
+
+For each search result used, record: **source name, date, the specific claim or figure, and URL**.
+
+### Step 0d — Draft the content brief
+
+Write a structured brief covering all four BP teams. For each team write **2–3 arguments**, each argument must have all four parts:
+
+```
+CLAIM      — one sentence stating what is true
+MECHANISM  — 2–3 sentences explaining the causal chain (how/why, not just that)
+EVIDENCE   — a named source + specific statistic, study finding, or real case
+             ❌ "studies show..."   ✅ "MIT Media Lab (2023) found that..."
+             ❌ "in many countries" ✅ "Germany's 2022 NetzDG law resulted in..."
+IMPACT     — what concretely breaks down if this argument is lost; who suffers and how
+```
+
+Also write:
+- **2–3 key clashes** — the central tensions where the teams' arguments directly collide
+- **CG and CO extension angles** — what genuinely new ground each closing bench can add beyond opening
+
+### Step 0e — Adversarial critique
+
+Re-read the brief and challenge every argument with these questions. Rewrite any that fail:
+
+1. **Is the evidence real and named?** If you wrote "research suggests" or "studies show" without a source, find a real one.
+2. **Is the mechanism specific?** If the mechanism is just a restatement of the claim ("X causes harm because X is harmful"), rewrite it with an actual causal chain.
+3. **Is the impact weighable?** Can you compare this impact against a competing one? If not, add a magnitude or scope qualifier.
+4. **Is the extension genuinely new?** If CG/CO arguments are just rephrasing OG/OO, replace them with a distinct framing or stakeholder.
+
+### Step 0f — Lock the brief
+
+After revisions, the brief is locked. All `.arg` card content, pull quotes, clash slides, and stat figures in the HTML **must come directly from this brief**. DB-sourced arguments and web-sourced evidence must both be present where available. Do not invent new content during templating.
+
+---
+
 ## Generation Workflow
 
 1. **Locate scripts** — resolve `$SLIDEGEN` using the path-detection block above (repo path first, installed path fallback).
 2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 73 blocks.
-3. **Plan** — decide which blocks suit the topic and deck type; list them (e.g. A2 → B1 → C3 × 3 → D3).
+3. **Plan** — decide which blocks suit the topic and deck type; list them (e.g. A2 → B1 → C3 × 3 → D3). For Case File / Reference decks, map each brief argument to a specific block.
 4. **Embed images** — run the embed script to write data URIs to files:
    ```bash
    python3 "$SLIDEGEN/embed-images.py"
@@ -162,14 +440,54 @@ document.addEventListener('touchend', e => {
    - `.logo_uri.txt` — full `data:image/png;base64,...` URI for the logo
    - `.theme_uri.txt` — full `data:image/png;base64,...` URI for the illustration
 
-   Read **`.logo_uri.txt`** with the Read tool and paste its entire contents as the `src` of every `<img alt="BPDU">` (brand bar + title slides). Read **`.theme_uri.txt`** and paste as the `src` of `.illo img` and `.closing-illo img`.
-   **Never use relative file paths** — the deck must open on any device without external files.
+   > ⚠️ **Never paste the URI contents inline into the HTML.** The logo is 330 KB and the theme image is 2.4 MB of base64 — any attempt to copy-paste them will silently truncate the data and break the images. Use placeholders instead (see step 6).
 
-   > ⚠️ Do NOT pipe the script output through `head`, `tr`, or any other shell filter — the URIs are 330 KB and 2.4 MB respectively; any truncation breaks the images. Use the files, not stdout.
+   > ⚠️ **Never use the Read tool on `.png` files** (`BPDU_LOGO.png`, `BPDU_theme_image.png`). The Read tool sends PNG files to the API as image content blocks, which will cause a fatal "Could not process image" error. All image handling goes through the scripts — never touch the raw PNG files directly.
+
 5. **Copy CSS** — read the relevant `<section>` elements from `slide-templates.html` and copy their CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
 6. **Write HTML** — build each `<section class="slide">` using the exact class names from the template. Annotate each slide's `data-tag` with a short label.
+
+   Use these exact placeholder strings as `src` values — **do not substitute real base64 here**:
+   - `__LOGO_URI__` for every `<img>` that should show the BPDU logo (brand bar + title/closing slides)
+   - `__THEME_URI__` for every `.illo img` and `.closing-illo img`
+
+   > ⚠️ **Mandatory:** the title slide MUST contain a `.illo` div and the closing slide MUST contain a `.closing-illo` div, each with an `<img src="__THEME_URI__">`. If these elements are absent, the theme image will never be injected and the file will be ~360 KB instead of ~2.7 MB — a silent failure. Always verify both are present before saving.
+
+   Required markup (must appear verbatim in the output):
+   ```html
+   <!-- in brand bar and title/closing slides: -->
+   <img src="__LOGO_URI__" alt="BPDU">
+
+   <!-- in title slide inner row: -->
+   <div class="illo"><img src="__THEME_URI__" alt=""></div>
+
+   <!-- in closing slide: -->
+   <div class="closing-illo"><img src="__THEME_URI__" alt=""></div>
+   ```
+
 7. **Wire JS** — use the navigation JS snippet verbatim (see below).
-8. **Save** — write the file to the working directory with a descriptive name.
+8. **Save** — write the file to the `tmp/` directory with a descriptive name (e.g. `tmp/casefile-[slug].html`). Never save to the repo root.
+9. **Inject images** — after saving, run this one-liner to substitute the placeholders with the real URIs:
+   ```bash
+   python3 - <<'PYEOF'
+   import re, pathlib
+   logo  = pathlib.Path('.logo_uri.txt').read_text().strip()
+   theme = pathlib.Path('.theme_uri.txt').read_text().strip()
+   p = pathlib.Path('OUTPUT_FILENAME.html')
+   html = p.read_text()
+   html = html.replace('__LOGO_URI__', logo).replace('__THEME_URI__', theme)
+   p.write_text(html)
+   print(f"Done — {len(html)//1024} KB")
+   PYEOF
+   ```
+   Replace `OUTPUT_FILENAME.html` with the actual filename. The file size should jump to ~2.7 MB confirming both images are fully embedded.
+
+   > ⚠️ **If the file stays ~360 KB after injection**, the `.illo` or `.closing-illo` elements were missing from the HTML. Go back, add them to the title and closing slides with `__THEME_URI__` as the src, re-save, and re-run the inject script.
 
 ## Output
-Produce the complete HTML code for the requested presentation as a single file. Save it with a descriptive filename (e.g., `casefile-[motion-slug].html` for Case Files).
+Produce the complete HTML code for the requested presentation or email as a single file. Save it to `tmp/` with a descriptive filename:
+- Case Files: `tmp/casefile-[motion-slug].html`
+- Event Host decks: `tmp/event-host-[slug].html`
+- Invitation Letters: `tmp/invite-[event]-[role].html`
+
+> ⚠️ **Never run any git commands.** Do not commit, stage, push, or modify git history at any point. Git operations are exclusively the user's responsibility.
