@@ -1,8 +1,8 @@
 ---
 name: slidegen
 description: |
-  Generates a branded BPDU HTML slide deck, case file, event host deck, or invitation email.
-  Use when the user asks for slides, a presentation, a case file, an event host deck, or a BPDU-branded email invitation.
+  Generates a branded BPDU HTML slide deck, case file, event host deck, experience sharing deck, or invitation email.
+  Use when the user asks for slides, a presentation, a case file, an event host deck, an experience sharing deck, or a BPDU-branded email invitation.
   Do NOT use for plain text outlines, PDF generation, or non-BPDU-branded content.
 allowed-tools: Bash(python3 *), Read, Write
 metadata:
@@ -20,8 +20,25 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
     1. **Reference** (Default): Dense, card-heavy, for reading.
     2. **Case File**: Briefing style, dark accents, focused on a specific motion.
     3. **Event Host**: Projection-ready, massive text, alternating backgrounds, live event features.
-    4. **Invitation Letter / Email**: Branded HTML email for inviting guests, panelists, judges, or participants to a BPDU event.
+    4. **Experience Sharing**: Elegant, warm, personal-presentation style. Editorial serif headings, cream backgrounds, reveal animations, floating decorative shapes, tip cards, score cards, QR contact slides.
+    5. **Invitation Letter / Email**: Branded HTML email for inviting panelists, judges, guests, or participants to BPDU events. Table-based layout with inline CSS for maximum email client compatibility.
 - **Outline (Optional):** Specific points or slides requested.
+
+## Quick Routing — Hashtags & Triggers
+
+Use these keywords to route the agent to the correct workflow immediately:
+
+| Hashtag / Keyword | Maps to | Example prompt |
+|---|---|---|
+| `#slides`, `#deck`, `presentation` | Slide Deck workflow (pick type below) | `/slidegen #slides Reference deck on THW ban social media` |
+| `#reference`, `#casefile`, `#event` | Specific slide deck type | `/slidegen #casefile THW abolish the death penalty` |
+| `#experience`, `#sharing`, `#talk`, `#workshop` | Experience Sharing workflow | `/slidegen #experience My IELTS journey` |
+| `#invite`, `#email`, `#letter` | Invitation Email workflow | `/slidegen #invite Judge invitation for Bowen Cup` |
+
+### Decision tree
+1. If the user mentions **email, invite, or letter** → use the **Invitation Email** workflow.
+2. If the user mentions **experience, sharing, talk, or workshop** → use the **Experience Sharing** workflow.
+3. Otherwise → use the **Slide Deck** workflow and pick the appropriate deck type from the list below.
 
 ## Design Requirements
 - **Color Palette:** Primary: `#F5C842` (Amber), Background: `#FFFFFF` (White) / `#FAFAF8` (Off-white), Text: `#1A1A1A`.
@@ -30,16 +47,16 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
 - **Layout:** Use `clamp()` for all sizing. Generous whitespace (max 70% content width).
 - **Navigation:** Arrow keys + Spacebar. Touch swipe support. Slide counter (e.g., "3 / 12").
 - **Transitions:** `translateX` or `scale` based on deck type.
-- **Assets:** Brand images are loaded from hosted CDN URLs (`bpdebate.club`). The output HTML requires an internet connection to display images. For fully offline decks, use `embed-images.py` (base64 mode) instead.
+- **Assets:** By default, use CDN-hosted URLs for brand images (fast, small files). Use base64 data URI embedding **only** when the user explicitly requests a fully offline/self-contained file.
 
 ## Template Library (canonical CSS + HTML source)
 
-`slide-templates.html` at the repo root is the **canonical block library** — 73 live, rendered layout blocks. Always read it for exact CSS and HTML markup before generating a new deck; never invent class names from scratch.
+`slide-templates.html` in `skills/slidegen/assets/` is the **canonical block library** — 84 live, rendered layout blocks. For agent use, read the smaller **per-group files** in `skills/slidegen/assets/templates/` instead. Each group file is a self-contained HTML preview containing the full CSS plus only that group's blocks. Use the monolithic `slide-templates.html` only as a browser preview or when you need the complete library in one file.
 
 ### Available scripts
 
 - **`scripts/catalog.py`** — Parses `slide-templates.html` and prints a compact block catalog (ID, name, background, CSS classes).
-- **`scripts/embed-images.py`** — Writes image URIs to `.logo_uri.txt` / `.theme_uri.txt`. Default mode encodes local PNGs as base64 data URIs. Use `--url` to write hosted CDN URLs instead.
+- **`scripts/embed-images.py`** — Writes image URIs to `.logo_uri.txt` / `.theme_uri.txt`. Default mode writes CDN URLs (`--url` flag). Base64 mode (`--base64` or no flag) encodes local PNGs as data URIs for fully offline decks.
 
 ### Locating the scripts
 
@@ -65,13 +82,13 @@ Output columns: `ID · Block/Name · Background · CSS classes & notes`. Use thi
 
 ### Step 2 — read the relevant blocks from the template
 
-Once you know which blocks you need (e.g. A1 title, B1 stats, C3 argument cards), read the matching `<section>` elements from `slide-templates.html` for the exact HTML structure and any inline style overrides. **Copy the markup verbatim and fill in content. The output HTML file must include the exact CSS class names from these blocks — do not hand-write slide layouts.**
+Once you know which blocks you need (e.g. A1 title, B1 stats, C3 argument cards), read the matching group file (`templates/group-a.html` for Group A, `templates/group-i.html` for Group I, etc.) for the exact HTML structure and any inline style overrides. **Copy the markup verbatim and fill in content. The output HTML file must include the exact CSS class names from these blocks — do not hand-write slide layouts.** Each group file contains the full CSS, so you can copy both the CSS tokens and the block markup from one file.
 
 ### Block groups at a glance
 
 | Group | Slides | What's in it |
 |-------|--------|-------------|
-| **A — Structure** | s1–s3 | Title light/dark, Accent amber |
+| **A — Structure** | s0–s3 | Index, Title light/dark, Accent amber |
 | **B — Core content** | s4–s10 | Stats row, Stat boxes dark, Parliament 2×2, Teams grid, Role grid 4-col, Speech pills, Timeline |
 | **C — Rich content** | s11–s23 | 2/3-col cards, Argument cards, Clash+VS, Word cards, Philosopher cards, POI bar+grid, POI big number, Criteria row, Extension cards, Frame+Ext box, Pull quote, Big quote+chips |
 | **D — Projection** | s24–s26 | Strategy grid dark, Hero text, Dark closing+CTA |
@@ -79,9 +96,10 @@ Once you know which blocks you need (e.g. A1 title, B1 stats, C3 argument cards)
 | **F — Creative II** | s37–s46 | Compact honeycomb, Burden pyramid, Glass cards, Radial burden, Clash pillars, Decision tree, Policy slider, Dense grid, Focus center, Nested rings |
 | **G — Creative III** | s47–s58 | Honey Pro, 3D stack, Heatmap, Web of tension, Dashboard, Keyhole, Architecture, Pulse, Steps, Table, Glass stakeholder, Final accent |
 | **H — Creative IV** | s59–s72 | Bubbles, Progress rings, Glass dash, Lightning, Checkgrid, Shadow cards, Roadmap, Prism, Pendulum, Glass list, Cycle, Split hero, Floating cards, Summary grid |
+| **I — Experience Sharing** | s73–s84 | Title experience, Self-intro, TOC, Tip cards, Big score, Philosophy diagram, Dark pillars, Promo cards, QR contact, Intro greeting, Two-path split, Contact closing |
 
 ### Reusable Slide Layout Types
-Use these layout classes to vary the presentation (all CSS is in `slide-templates.html`):
+Use these layout classes to vary the presentation (all CSS is in every group file):
 - **Title**: `.inner.row` + `.illo` on right. Always includes logo + illustration.
 - **Stats**: `.stats` flex row of `.stat` cards. Quant overview, 3–5 numbers.
 - **2×2 Grid**: `.parliament` CSS grid. Comparing 4 items (e.g., the four BP teams).
@@ -92,8 +110,21 @@ Use these layout classes to vary the presentation (all CSS is in `slide-template
 - **Meet the Teachers**: Public event style. Blends projection-ready hero text with informational cards for guest bios and motion breakdowns.
 - **Teacher Card**: `.teacher-card` (flex-row) with `.teacher-img` (left) and `.teacher-info` (right). For guest bios.
 - **Motion Anatomy**: `.motion-anatomy` grid of `.term-card` elements. Breaks down motion definitions for the public.
-
-## Print Poster / Flyer Templates
+- **Tip Cards**: `.tip-cards` flex column of `.tip-card` elements (icon + text, left gold border). For advice, suggestions, or step-by-step tips.
+- **Big Score**: `.score-slide` with `.big-score` watermark number + `.score-cards-row` of `.score-card` pills. For displaying quantitative results (test scores, metrics).
+- **Philosophy Diagram**: `.philosophy-diagram` row of `.thought-box` cards with `.thought-arrow` separators. For contrasting two approaches (right vs wrong way).
+- **Dark Feature Pillars**: `.debate-slide` dark background with `.pillars-row` of `.glass-pillar` cards + `.debate-stats-row`. For dramatic feature highlights.
+- **Promo Cards**: `.promo-row` grid of `.promo-card` elements with top gradient border and bullet lists. For promoting events, clubs, or opportunities.
+- **QR Contact**: `.qr-row` of `.qr-card` elements with embedded QR images + `.contact-links`. For closing slides with WeChat / social contact.
+- **Self-Introduction Card**: `.self-card` centered card with `.name`, `.role`, `.self-tags`. For speaker bios.
+- **Table of Contents**: `.toc-list` of `.toc-item` with `.toc-num`, `.toc-label`, `.toc-line`. For agenda/overview slides.
+- **Intro Greeting**: `.intro-slide` with `.intro-greeting` and `.intro-desc`. For welcoming the audience.
+- **Two-Path Split**: Two `.tip-card` elements side-by-side in a flex row, used as path/choice cards.
+- **Gold Divider**: `.gold-divider` with `.diamond` center. Elegant horizontal rule for visual separation.
+- **Decorative Elements**: `.deco-circle`, `.deco-ring`, `.deco-dot` with `animation: float` / `floatSlow`. Floating ambient shapes for atmosphere.
+- **Corner Brackets**: `.corner-tl` + `.corner-br` thin gold L-shapes. Adds editorial framing to title/closing slides.
+- **Section Number Watermark**: `.section-number` giant faded numeral. Adds depth to content slides.
+- **Reveal Animations**: `.reveal`, `.reveal-left`, `.reveal-right`, `.reveal-scale` with `.stagger-1`…`.stagger-7` delays. Content fades/slides in when the slide becomes active.
 
 The following A4 print-ready HTML poster/flyer templates are available as canonical reference for event promotion materials. These are **not** slide decks — they are single-page (or multi-page), self-contained HTML files designed for A4 printing (`794px × 1123px`).
 
@@ -121,6 +152,10 @@ When generating new event flyers or posters, read the relevant template file fir
 
 Branded HTML emails for inviting panelists, judges, guests, or participants to BPDU events. Designed for maximum compatibility across email clients using **table-based layout with inline CSS**.
 
+### Canonical source
+
+Read `skills/slidegen/email-skeleton.html` for the full canonical skeleton. It contains the complete table-based email structure with inline CSS and all placeholder slots. Copy it verbatim and fill in the bracketed placeholders. All CSS must remain inline — never use `<style>` blocks or external stylesheets for email output.
+
 ### Design system
 
 | Element | Specification |
@@ -133,103 +168,6 @@ Branded HTML emails for inviting panelists, judges, guests, or participants to B
 | **Text secondary** | `#261e40` (muted navy) |
 | **Typography** | `'Varela Round'`, system-ui, sans-serif; body `15px`, line-height `1.75` |
 | **Card shadow** | `0 2px 16px rgba(6,20,37,0.06)` |
-
-### Canonical structure
-
-Copy this skeleton verbatim and fill in the bracketed placeholders. All CSS must remain inline — never use `<style>` blocks or external stylesheets for email output.
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[Event Name] — [Invitation Type]</title>
-</head>
-<body style="margin:0; padding:0; background:#f5f0e6; font-family:'Varela Round',system-ui,sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f0e6; padding:40px 0;">
-<tr><td align="center">
-<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#fff; overflow:hidden; box-shadow:0 2px 16px rgba(6,20,37,0.06);">
-
-  <!-- Amber accent bar -->
-  <tr><td style="background:#ffc62a; height:4px; font-size:0; line-height:0;">&nbsp;</td></tr>
-
-  <!-- Header with logo -->
-  <tr>
-    <td style="background:#fff; padding:28px 40px 20px; text-align:center;">
-      <a href="https://bpdebate.club" style="text-decoration:none; display:inline-block;">
-        <img src="https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png" alt="BP Debate Union" width="48" height="48" style="display:inline-block; vertical-align:middle; border:0;">
-        <span style="display:inline-block; vertical-align:middle; margin-left:12px; font-size:20px; font-weight:700; color:#061425; letter-spacing:0.5px; text-transform:uppercase;">BP DEBATE UNION</span>
-      </a>
-    </td>
-  </tr>
-
-  <!-- Gold divider -->
-  <tr><td style="padding:0 40px;"><div style="border-bottom:3px solid #ffc62a; width:60px; margin:0 auto;"></div></td></tr>
-
-  <!-- Event title -->
-  <tr>
-    <td style="padding:24px 40px 8px; text-align:center;">
-      <div style="font-size:26px; font-weight:700; color:#061425; letter-spacing:0.5px;">[Event Name]</div>
-      <div style="font-size:13px; color:#261e40; margin-top:6px; letter-spacing:2px; text-transform:uppercase;">[Invitation Type]</div>
-    </td>
-  </tr>
-
-  <!-- Body -->
-  <tr>
-    <td style="padding:28px 40px 16px;">
-      <p style="margin:0 0 18px; font-size:15px; color:#061425; line-height:1.75;">Dear [Recipient Name],</p>
-      <p style="margin:0 0 18px; font-size:15px; color:#061425; line-height:1.75;">[Opening paragraph — context + invitation ask]</p>
-      <!-- Optional: schedule table or extra details -->
-    </td>
-  </tr>
-
-  <!-- Closing -->
-  <tr>
-    <td style="padding:0 40px 32px;">
-      <p style="margin:0 0 18px; font-size:15px; color:#061425; line-height:1.75;">[Closing paragraph — gratitude + next steps]</p>
-      <p style="margin:0 0 4px; font-size:15px; color:#061425; line-height:1.75;">Best regards,</p>
-    </td>
-  </tr>
-
-  <!-- Signature -->
-  <tr>
-    <td style="padding:0 40px 28px;">
-      <table role="presentation" cellpadding="0" cellspacing="0">
-        <tr>
-          <td style="border-left:3px solid #ffc62a; padding-left:16px;">
-            <div style="font-size:16px; font-weight:700; color:#061425;">[Sender Name]</div>
-            <div style="font-size:13px; color:#261e40; margin-top:2px;">[Title], BP Debate Union</div>
-            <div style="font-size:13px; color:#261e40; margin-top:4px;">
-              <a href="mailto:team@bpdebate.club" style="color:#061425; text-decoration:underline;">team@bpdebate.club</a>
-            </div>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <!-- Theme illustration -->
-  <tr>
-    <td style="padding:0 40px 28px; text-align:center;">
-      <img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png" alt="BP Debate Union" width="400" style="display:block; margin:0 auto; max-width:100%; height:auto; border-radius:8px;">
-    </td>
-  </tr>
-
-  <!-- Footer -->
-  <tr>
-    <td style="background:#061425; padding:20px 40px; text-align:center;">
-      <a href="https://bpdebate.club" style="color:#ffc62a; font-size:12px; text-decoration:none; letter-spacing:1px;">bpdebate.club</a>
-      <div style="font-size:11px; color:#999; margin-top:6px;">Where logic clashes, minds meet, ideas matter...</div>
-    </td>
-  </tr>
-
-</table>
-</td></tr>
-</table>
-</body>
-</html>
-```
 
 ### Variable placeholders
 
@@ -245,24 +183,7 @@ Copy this skeleton verbatim and fill in the bracketed placeholders. All CSS must
 
 ### Schedule table (optional)
 
-When the invitation includes an event schedule, insert this table markup inside the body cell:
-
-```html
-<p style="margin:0 0 24px; font-size:15px; color:#061425; line-height:1.75;">The tournament schedule is as follows:</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; border:2px solid #061425;">
-  <tr>
-    <th style="background:#061425; color:#fff; padding:10px 16px; font-size:13px; text-align:left; font-weight:600;">Time</th>
-    <th style="background:#061425; color:#fff; padding:10px 16px; font-size:13px; text-align:left; font-weight:600;">Activity</th>
-    <th style="background:#061425; color:#fff; padding:10px 16px; font-size:13px; text-align:left; font-weight:600;">Notes</th>
-  </tr>
-  <tr>
-    <td style="padding:10px 16px; font-size:14px; color:#061425; border-bottom:1px solid #e8e4da;"><strong>09:00 – 11:00</strong></td>
-    <td style="padding:10px 16px; font-size:14px; color:#061425; border-bottom:1px solid #e8e4da;">Round 1</td>
-    <td style="padding:10px 16px; font-size:14px; color:#061425; border-bottom:1px solid #e8e4da;">Opening round</td>
-  </tr>
-  <!-- stripe alternate rows with background:#fefbf3 -->
-</table>
-```
+When the invitation includes an event schedule, insert a table markup block inside the body cell. See `email-skeleton.html` for the schedule table template.
 
 ### Output
 Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[event]-[role].html`.
@@ -272,18 +193,13 @@ Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[eve
 - **Case File**: Briefing style, dark accents, argument cards with `.arg::before`.
 - **Event Host**: Projection-ready, massive text (`.hero`), alternating backgrounds, live event features.
 - **Meet the Teachers**: Public-facing guest event style. Blends theatrical projection with informative biographies and concept breakdowns.
-
-### Negative Constraints (do NOT do these)
-- Do NOT use `display:none` for slides — it breaks transitions.
-- Do NOT invent new CSS class names. Copy verbatim from `slide-templates.html`.
-- Do NOT skip Step 0e (adversarial critique) for Case File or Reference decks.
-- Do NOT paste multi-megabyte base64 inline during editing — use hosted URLs or the embed script.
-- Do NOT save generated files to the repo root — always use `tmp/`.
+- **Experience Sharing**: Elegant personal-presentation style. Warm cream backgrounds (`var(--bg-warm)`), editorial serif feel (`'Lora'`), generous whitespace, floating decorative shapes, reveal animations with stagger. Designed for talks, workshops, and storytelling — one idea per slide, tip cards for advice, score cards for metrics, promo cards for CTAs, QR cards for contact. Always uses `__THEME_URI__` on title and closing slides with `.illo` / `.closing-illo`.
 
 ### Mandatory Brand Bar HTML
 ```html
+<!-- src is either a CDN URL (default, fast) or a base64 data URI (offline mode) -->
 <header class="brand-bar">
-  <img src="https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png" alt="BPDU">
+  <img src="__LOGO_URI__" alt="BPDU">
   <span class="brand-bar-name">BP Debate Union</span>
   <span class="brand-bar-dot"></span>
   <span class="brand-bar-slide-tag" id="slideTag"></span>
@@ -336,6 +252,67 @@ document.addEventListener('touchend', e => {
   if (Math.abs(dx) > 48) go(dx < 0 ? cur + 1 : cur - 1);
 });
 ```
+
+### Experience Sharing — Extra CSS & JS
+
+For **Experience Sharing** decks, include these additional patterns after the base CSS.
+
+**Fonts:**
+```html
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+```
+
+**Reveal animations (add to <style>):**
+```css
+.reveal, .reveal-left, .reveal-right, .reveal-scale {
+  opacity: 0;
+  transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+}
+.reveal       { transform: translateY(25px) }
+.reveal-left  { transform: translateX(-30px) }
+.reveal-right { transform: translateX(30px) }
+.reveal-scale { transform: scale(.88); transition-duration: .8s }
+.slide.active .reveal,
+.slide.active .reveal-left,
+.slide.active .reveal-right,
+.slide.active .reveal-scale {
+  opacity: 1; transform: translateY(0) translateX(0) scale(1);
+}
+.slide.active .stagger-1 { transition-delay: .05s }
+.slide.active .stagger-2 { transition-delay: .15s }
+.slide.active .stagger-3 { transition-delay: .25s }
+.slide.active .stagger-4 { transition-delay: .35s }
+.slide.active .stagger-5 { transition-delay: .45s }
+.slide.active .stagger-6 { transition-delay: .55s }
+.slide.active .stagger-7 { transition-delay: .65s }
+```
+
+**Counter animation (add to <script>, triggers when slide gains `.active`):**
+```js
+const slides = document.querySelectorAll('.slide');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('[data-counter]').forEach(el => {
+        if (el.dataset.counted) return;
+        el.dataset.counted = 'true';
+        const target = parseFloat(el.dataset.counter);
+        const start = performance.now();
+        const animate = (now) => {
+          const progress = Math.min((now - start) / 1400, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = (target * eased).toFixed(1);
+          if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
+      });
+    }
+  });
+}, { threshold: 0.45 });
+slides.forEach(slide => observer.observe(slide));
+```
+
+Use `data-counter="7.5"` on score elements; the script animates from `0.0` to the target value.
 
 ## Phase 0 — Research & Content Brief
 
@@ -431,54 +408,91 @@ After revisions, the brief is locked. All `.arg` card content, pull quotes, clas
 
 ## Generation Workflow
 
+### Workflow A — Slide Deck (Reference / Case File / Event Host / Meet the Teachers)
+
+Follow these steps when generating any standard slide deck.
+
 1. **Locate scripts** — resolve `$SLIDEGEN` using the path-detection block above (repo path first, installed path fallback).
-2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 73 blocks.
-3. **Plan** — decide which blocks suit the topic and deck type; list them (e.g. A2 → B1 → C3 × 3 → D3). For Case File / Reference decks, map each brief argument to a specific block.
-4. **Copy CSS** — read the relevant `<section>` elements from `slide-templates.html` and copy their CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
-5. **Write HTML** — build each `<section class="slide">` using the exact class names from the template. Annotate each slide's `data-tag` with a short label.
+2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 84 blocks and pick the groups you need.
+3. **Plan** — decide which group files suit the topic and deck type; list them (e.g. `group-a.html` → `group-c.html`). For Case File / Reference decks, map each brief argument to a specific block.
+4. **Embed images** — run the embed script with the `--url` flag to write CDN URLs to files (default, fast):
+   ```bash
+   python3 "$SLIDEGEN/embed-images.py" --url \
+     https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png \
+     https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png
+   ```
+   This writes two files to the **current working directory** (not to stdout):
+   - `.logo_uri.txt` — the CDN URL for the logo
+   - `.theme_uri.txt` — the CDN URL for the illustration
 
-   Use the **hosted CDN URLs** directly as `src` values:
-   - `https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png` for every `<img>` that should show the BPDU logo (brand bar + title/closing slides)
-   - `https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png` for every `.illo img` and `.closing-illo img`
+   > ⚠️ **Offline mode:** If the user explicitly requests a fully offline/self-contained file, omit `--url` to generate base64 data URIs instead. The file will grow to ~2.7 MB but works without internet.
 
-   > ⚠️ **Mandatory:** the title slide MUST contain a `.illo` div and the closing slide MUST contain a `.closing-illo` div, each with an `<img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png">`. If these elements are absent, the theme image will be missing — a silent failure. Always verify both are present before saving.
+   > ⚠️ **Never use the Read tool on `.png` files** (`BPDU_LOGO.png`, `BPDU_theme_image.png`). The Read tool sends PNG files to the API as image content blocks, which will cause a fatal "Could not process image" error. All image handling goes through the scripts — never touch the raw PNG files directly.
+
+5. **Copy CSS** — read the relevant group file (e.g. `templates/group-c.html`) and copy its CSS classes verbatim into the output file's `<style>` block. Always include the full `:root` token block and all responsive `@media` rules.
+6. **Write HTML** — build each `<section class="slide">` using the exact class names from the group file. Annotate each slide's `data-tag` with a short label.
+
+   Use these exact placeholder strings as `src` values — **do not substitute real base64 here**:
+   - `__LOGO_URI__` for every `<img>` that should show the BPDU logo (brand bar + title/closing slides)
+   - `__THEME_URI__` for every `.illo img` and `.closing-illo img`
+
+   > ⚠️ **Mandatory:** the title slide MUST contain a `.illo` div and the closing slide MUST contain a `.closing-illo` div, each with an `<img src="__THEME_URI__">`. If these elements are absent, the theme image will never be injected and the file will be ~360 KB instead of ~2.7 MB — a silent failure. Always verify both are present before saving.
 
    Required markup (must appear verbatim in the output):
    ```html
    <!-- in brand bar and title/closing slides: -->
-   <img src="https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png" alt="BPDU">
+   <img src="__LOGO_URI__" alt="BPDU">
 
    <!-- in title slide inner row: -->
-   <div class="illo"><img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png" alt=""></div>
+   <div class="illo"><img src="__THEME_URI__" alt=""></div>
 
    <!-- in closing slide: -->
-   <div class="closing-illo"><img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png" alt=""></div>
+   <div class="closing-illo"><img src="__THEME_URI__" alt=""></div>
    ```
 
-6. **Wire JS** — use the navigation JS snippet verbatim (see below).
-7. **Save** — write the file to the `tmp/` directory with a descriptive name (e.g. `tmp/casefile-[slug].html`). Never save to the repo root.
-8. **Validate** — run the validation script on the output file:
+7. **Wire JS** — use the navigation JS snippet verbatim (see below).
+8. **Save** — write the file to the `tmp/` directory with a descriptive name (e.g. `tmp/casefile-[slug].html`). Never save to the repo root.
+9. **Inject images** — after saving, run this one-liner to substitute the placeholders with the real URIs:
    ```bash
-   python3 "$SLIDEGEN/validate.py" tmp/OUTPUT_FILENAME.html
+   python3 - <<'PYEOF'
+   import re, pathlib
+   logo  = pathlib.Path('.logo_uri.txt').read_text().strip()
+   theme = pathlib.Path('.theme_uri.txt').read_text().strip()
+   p = pathlib.Path('OUTPUT_FILENAME.html')
+   html = p.read_text()
+   html = html.replace('__LOGO_URI__', logo).replace('__THEME_URI__', theme)
+   p.write_text(html)
+   print(f"Done — {len(html)//1024} KB")
+   PYEOF
    ```
-   Fix any FAIL or WARN before returning the result to the user.
+   Replace `OUTPUT_FILENAME.html` with the actual filename.
+   - **Default (CDN URLs):** file stays ~360 KB — this is correct and fast.
+   - **Offline (base64 mode):** file jumps to ~2.7 MB — confirms both images are fully embedded.
+
+   > ⚠️ **If the file stays at placeholder size after injection** (e.g. `__LOGO_URI__` still visible in the source), the `.illo` or `.closing-illo` elements were missing from the HTML. Go back, add them to the title and closing slides, re-save, and re-run the inject script.
+
+### Workflow B — Experience Sharing Deck
+
+Follow Workflow A steps 1–9, with these modifications:
+
+- **Step 2 (Catalog):** Focus on Group I blocks (`templates/group-i.html`) — s73–s84.
+- **Step 5 (CSS):** After copying the base CSS from the group file, append the **Experience Sharing Extra CSS** (reveal animations, stagger delays, decorative shapes, gold divider, corner brackets, etc.) from the appendix below.
+- **Step 5 (Fonts):** Load `'Lora'` + `'DM Sans'` via Google Fonts link instead of `'Poppins'`.
+- **Step 7 (JS):** Append the **Counter Animation** JS snippet from the appendix below. Use `data-counter="7.5"` on score elements.
+- **Step 8 (Save):** Use a descriptive name like `tmp/experience-[topic-slug].html`.
+
+### Workflow C — Invitation Email
+
+1. **Read skeleton** — read `skills/slidegen/email-skeleton.html` for the complete table-based email structure.
+2. **Fill placeholders** — replace all bracketed placeholders (`[Event Name]`, `[Recipient Name]`, `[Sender Name]`, etc.) with real content.
+3. **Optional schedule** — if the invitation includes a schedule, insert the schedule table markup from the skeleton inside the body cell.
+4. **Save** — write the file to `tmp/` with a descriptive name, e.g. `tmp/invite-[event]-[role].html`.
+
+> ⚠️ **Do NOT run `catalog.py` or `embed-images.py` for emails.** Emails use CDN-hosted logo/illustration URLs, not base64 data URIs. Emails do not need JS navigation or CSS variables.
 
 ## Output
 Produce the complete HTML code for the requested presentation or email as a single file. Save it to `tmp/` with a descriptive filename:
-- Case Files: `tmp/casefile-[motion-slug].html`
-- Event Host decks: `tmp/event-host-[slug].html`
-- Invitation Letters: `tmp/invite-[event]-[role].html`
+- Slide decks: `tmp/casefile-[motion-slug].html`, `tmp/eventhost-[event-slug].html`, `tmp/experience-[topic-slug].html`
+- Emails: `tmp/invite-[event]-[role].html`
 
 > ⚠️ **Never run any git commands.** Do not commit, stage, push, or modify git history at any point. Git operations are exclusively the user's responsibility.
-
----
-
-## Validation Checklist (run before returning output)
-
-1. [ ] File saved to `tmp/` (never repo root)
-2. [ ] Brand bar (`<header class="brand-bar">`) exists in the HTML
-3. [ ] Title slide contains `.illo` div with `<img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png">`
-4. [ ] Closing slide contains `.closing-illo` div with `<img src="https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png">`
-5. [ ] For Event Host decks: `CONFIG` object exists at top of `<script>`
-6. [ ] No `display:none` used on `.slide` elements
-7. [ ] `validate.py` reports PASS (or only WARN for non-critical issues)

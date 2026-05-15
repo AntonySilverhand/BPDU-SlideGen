@@ -86,19 +86,24 @@ All generated slides must match the BPDU visual identity observed in `Pasted ima
 
 ## Asset Paths
 
-Brand assets live at the repo root (same directory as generated slides):
+Brand assets live at the repo root:
 - `BPDU_LOGO.png` — logo, use in title/closing slides
 - `BPDU_theme_image.png` — decorative group illustration
-- Reference them with relative paths: `src="BPDU_LOGO.png"`
+
+**CDN mode (default):** run `python3 skills/slidegen/scripts/embed-images.py --url [logo-url] [theme-url]` to write CDN URLs to `.logo_uri.txt` and `.theme_uri.txt`. Use `__LOGO_URI__` and `__THEME_URI__` placeholders in the HTML, then inject them after saving. The output stays small (~360 KB) but requires an internet connection to display images.
+
+**Embedding mode (offline):** omit `--url` to generate base64 data URIs. The output is a fully self-contained file (~2.7 MB) with no external dependencies — use this only when the user explicitly requests an offline file.
+
+Never reference raw PNG files with relative paths in the final output — use either CDN URLs or base64 data URIs.
 
 ## Skill Architecture
 
 Skills in this repo follow the agentskills.io pattern: each skill is a Markdown file with YAML frontmatter describing its trigger and a prompt body that instructs Claude how to execute the task.
 
-Planned skills:
-- `slidegen` — primary skill: takes a topic/outline, produces a branded HTML deck
-- `slide-theme` — applies or modifies the BPDU theme on an existing HTML deck
-- `slide-export-tips` — advises on printing/PDF export from the generated HTML
+Active skills:
+- `slidegen` — primary skill: takes a topic/outline, produces a branded HTML deck, experience sharing deck, or invitation email
+- `deep-analysis` — motion research and content brief generation
+- `imagegen` — AI illustration generation for slide decks
 
 When building skills, keep the prompt body focused: describe the output format precisely (slide structure, CSS variables to use, JS navigation snippet) so the generating model produces consistent results across invocations.
 
@@ -133,6 +138,7 @@ Add class `.a` to every content child. The CSS animates them in with `translateY
 const slides = document.querySelectorAll('.slide');
 const progress = document.getElementById('progress');
 const counter  = document.getElementById('counter');
+const slideTag = document.getElementById('slideTag');
 const total = slides.length;
 let cur = 0;
 
@@ -145,6 +151,7 @@ function go(n) {
   slides[cur].classList.add('active');
   progress.style.width = ((cur + 1) / total * 100) + '%';
   counter.textContent  = `${cur + 1} / ${total}`;
+  slideTag.textContent = slides[cur].dataset.tag || '';
 }
 
 document.addEventListener('keydown', e => {
@@ -187,35 +194,48 @@ These eight layouts cover the patterns in `bp-debate-rules.html`:
 
 ## Deck Types
 
-Three distinct deck types exist in this repo. Each has different design priorities:
+Five distinct output types exist in this repo, grouped into three categories. Each has different design priorities and template blocks:
 
-### 1. Reference deck (`bp-debate-rules.html`)
+### Category 1 — Standard Slide Decks
+
+These use blocks from Groups A–H (s0–s72) in the template library.
+
+#### 1. Reference deck (`bp-debate-rules.html`)
 Dense, card-heavy, designed for reading. Left-aligned layouts, many cards per slide, inner padding `clamp(16px,3.5vh,48px)`. Audience reads the slide.
 
-### 2. Case file deck (`casefile-fearing-death.html`)
+#### 2. Case file deck (`casefile-fearing-death.html`)
 Briefing-document style. Dark title/closing, amber accent for the central clash, argument cards with `.arg::before` left-colour bar, pull-quotes. Audience reads + host elaborates. Naming convention: `casefile-[motion-slug].html`.
 
-### 3. Event host deck (`event-host-deck.html`)
-**Designed for live projection. Host talks; slide is a visual anchor.** Key rules:
-- **One idea per slide.** Maximum 3–4 items total per slide — no dense cards.
-- **Text is massive.** `.hero` = `clamp(2.2rem,6vw,5.5rem)`. Everything readable from 5 metres.
-- **Centred layout.** `.inner` uses `align-items:center; text-align:center` by default.
-- **Alternating backgrounds create rhythm.** Sequence: dark → light → amber → light → dark → amber...
-- **Event CONFIG block at top of `<script>`.** `eventName`, `eventDate`, `motion`, `prepMinutes` are JS variables applied via `textContent` — never hardcode event details into HTML.
-- **Slide transition is scale-based** (`scale(.97) translateY(8px)` → `scale(1)`), not translateX — feels more theatrical for projection.
-- **`.dark` / `.amber` / `.light` classes** on each `<section>` set text colour defaults; slide backgrounds set separately via `#sN { background: ... }`.
-- **Live badge** in brand bar (animated red dot) signals "this is a live event deck".
+#### 3. Event host deck (`event-host-deck.html`)
+**Designed for live projection.** Host talks; slide is a visual anchor. Key rules:
+- **One idea per slide.** Maximum 3–4 items total per slide.
+- **Text is massive.** `.hero` = `clamp(2.2rem,6vw,5.5rem)`. Readable from 5 metres.
+- **Centred layout.** `.inner` uses `align-items:center; text-align:center`.
+- **Alternating backgrounds** create rhythm: dark → light → amber → ...
+- **Event CONFIG block** at top of `<script>`: `eventName`, `eventDate`, `motion`, `prepMinutes`.
+- **Scale-based transitions** (`scale(.97)` → `scale(1)`), not translateX.
+- **Live badge** in brand bar signals "this is a live event deck".
 
-#### Event host deck flow (standard 11 slides)
-`Welcome → Motion → How It Works → Four Teams → Speaking Order → POIs → Judging Criteria → Extension Rule → Prep Time → Good Luck → After the Round`
+Standard 11-slide flow: `Welcome → Motion → How It Works → Four Teams → Speaking Order → POIs → Judging Criteria → Extension Rule → Prep Time → Good Luck → After the Round`
 
-#### Adapting for each event
-Only edit the CONFIG object — never touch slide HTML for routine events:
-```js
-const CONFIG = {
-  eventName:   "BPDU Weekly Round",
-  eventDate:   "31 March 2026",
-  motion:      "the culture of fearing death.",
-  prepMinutes: 15,
-};
-```
+#### 4. Meet the Teachers deck
+Public-facing guest event style. Blends theatrical projection with informative biographies and concept breakdowns. Uses `.teacher-card` and `.motion-anatomy` blocks.
+
+### Category 2 — Experience Sharing Decks
+
+#### 5. Experience Sharing deck (`ielts-experience-sharing.html`)
+Elegant personal-presentation style. Uses Group I blocks (s73–s84) exclusively.
+- **Fonts:** `'Lora'` (serif headings) + `'DM Sans'` (body)
+- **Backgrounds:** warm cream (`var(--bg-warm)`)
+- **Animations:** reveal animations with stagger delays (`.reveal`, `.stagger-1`…`.stagger-7`)
+- **Decorative:** floating shapes (`.deco-circle`, `.deco-ring`, `.deco-dot`)
+- **Components:** tip cards, big score displays, philosophy diagrams, QR contact cards, self-introduction cards
+- **Counter animation:** JS `IntersectionObserver` animates numbers from `0.0` to target
+
+### Category 3 — Invitation Emails
+
+#### 6. Invitation Email (`email-skeleton.html`)
+Table-based HTML email with inline CSS. Not a slide deck — a 600px-wide email card.
+- **Design:** warm cream outer (`#f5f0e6`), white card (`#ffffff`), amber accents (`#ffc62a`)
+- **Compatibility:** no `<style>` blocks, all inline CSS for email client safety
+- **Output:** `tmp/invite-[event]-[role].html`
