@@ -24,21 +24,62 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
     5. **Invitation Letter / Email**: Branded HTML email for inviting panelists, judges, guests, or participants to BPDU events. Table-based layout with inline CSS for maximum email client compatibility.
 - **Outline (Optional):** Specific points or slides requested.
 
-## Quick Routing — Hashtags & Triggers
+## Input Parsing & Auto-Routing
 
-Use these keywords to route the agent to the correct workflow immediately:
+The user does not need to remember hashtags or keywords. They speak naturally (e.g., "make me a deck about school dropout" or "I need a case file on THW ban social media"). The agent infers everything from the user's language.
 
-| Hashtag / Keyword | Maps to | Example prompt |
-|---|---|---|
-| `#slides`, `#deck`, `presentation` | Slide Deck workflow (pick type below) | `/slidegen #slides Reference deck on THW ban social media` |
-| `#reference`, `#casefile`, `#event` | Specific slide deck type | `/slidegen #casefile THW abolish the death penalty` |
-| `#experience`, `#sharing`, `#talk`, `#workshop` | Experience Sharing workflow | `/slidegen #experience My IELTS journey` |
-| `#invite`, `#email`, `#letter` | Invitation Email workflow | `/slidegen #invite Judge invitation for Bowen Cup` |
+### How to infer the workflow
 
-### Decision tree
-1. If the user mentions **email, invite, or letter** → use the **Invitation Email** workflow.
-2. If the user mentions **experience, sharing, talk, or workshop** → use the **Experience Sharing** workflow.
-3. Otherwise → use the **Slide Deck** workflow and pick the appropriate deck type from the list below.
+**Step 1 — Detect the output type**
+
+| User says something like... | Inferred workflow |
+|---|---|
+| "email," "invite," "letter," " invitation" | Invitation Email |
+| "experience sharing," "my IELTS journey," "talk about," "workshop on my..." | Experience Sharing |
+| "case file," "briefing on," "motion analysis" | Slide Deck → Case File |
+| "event host," "hosting," "live event," "projection" | Slide Deck → Event Host |
+| "reference," "rules," "guide," "training" | Slide Deck → Reference |
+| Anything else ("slides on X," "deck about Y," "presentation for Z") | Slide Deck → Reference (default) |
+
+**Step 2 — Detect speed mode**
+
+| User signals... | Speed |
+|---|---|
+| "just give me," "quick," "rush through," "draft," "rough," "something simple," "fast" | FAST — skip Phase 0, generate from model knowledge |
+| No urgency cues, or "thorough," "detailed," "comprehensive," "in-depth" | DEEP — run full Phase 0 (default) |
+
+**Step 3 — Detect domain**
+
+| User signals... | Domain |
+|---|---|
+| "pros and cons," "workshop on," "teaching slides," "general presentation," topic is clearly non-debate | GENERAL — neutral colors, no BP conventions |
+| Topic looks like a motion ("THW...", "THB..."), or is clearly debate-related | DEBATE — gov/opp colors, BP structure (default) |
+| Ambiguous | DEBATE (default) |
+
+**Summary of defaults:**
+- Output type → inferred from language (see Step 1)
+- Speed → DEEP unless user signals hurry
+- Domain → DEBATE unless user explicitly frames as non-debate
+
+> **The user never needs to type hashtags.** Hashtags (`#quick`, `#general`, etc.) are accepted as explicit overrides for power users, but the agent must never ask the user to use them.
+
+## Debate Strategy Content
+
+When generating training decks, strategy guides, or coaching materials, read `skills/slidegen/assets/debate-strategy.md` for structured BP debate theory from the UChicago Debate Society workshop.
+
+### When to reference strategy content
+
+| User asks for... | Action |
+|---|---|
+| "BP strategy guide," "how to debate," "debate training" | Read Sections 1, 3 (pillars 1–3), 4, 5, 6, 7. Generate a training deck covering these fundamentals. |
+| "How to prep in 15 minutes," "prep strategy" | Read Section 4 only. Generate a focused prep-guide deck or card. |
+| "How to write a PM speech," "PM intro tips" | Read Section 5 (Rhetorical Architecture). Generate speech-structure slides. |
+| "How to win as CG" / "CO strategy" / "Closing bench tips" | **STOP.** You cannot advise closing bench without knowing the opening half. First generate OG + OO content (or ask the user for it). Only after OG/OO exists may you read Section 2 and Section 3 (pillar 4) to advise on extension and weighing. |
+| Case File on a motion | Optionally inject **one** strategy tip card per deck (e.g., a `.tip-card` reminding debaters to check "Did you mechanize this argument?" from Section 7). Do not overload the deck. |
+
+### Critical constraint
+
+**Never use opponent-dependent strategy sections (Section 2, Section 3 pillar 4) without first establishing Opening Government and Opening Opposition content.** If the user asks for closing-bench strategy and no opening half exists, explain that closing strategy requires knowing what OG/OO said, then offer to generate the opening half first.
 
 ## Design Requirements
 - **Color Palette:** Primary: `#F5C842` (Amber), Background: `#FFFFFF` (White) / `#FAFAF8` (Off-white), Text: `#1A1A1A`.
@@ -316,9 +357,13 @@ Use `data-counter="7.5"` on score elements; the script animates from `0.0` to th
 
 ## Phase 0 — Research & Content Brief
 
-**Required for Case File and Reference decks. Skip for Event Host.**
+**Default behavior: ALWAYS run this phase.** Deep mode is the default for all decks regardless of type. Skip Phase 0 only when:
+- The user explicitly says **#quick** / **#fast**, OR
+- The user's language signals urgency or minimal-effort intent (e.g., "just give me," "rush through," "draft," "rough," "something simple").
 
-This phase runs entirely in text — no HTML, no templates. Its output is a validated content brief that all slide content must be drawn from. Do not skip or abbreviate it; shallow briefs produce shallow slides.
+This phase runs entirely in text — no HTML, no templates. Its output is a validated content brief that all slide content must be drawn from.
+
+> **Content completeness rule:** Once the brief is locked, **do not truncate, compress, or omit any argument, clash, or piece of evidence to fit a predetermined slide count.** Slide count is emergent — it expands to fit the content. If the brief contains 12 arguments and 5 clashes, generate as many slides as needed to present every one of them. The model should never discard synthesized content just because it exceeds an expected deck length.
 
 ### Step 0a — Check local knowledge base
 
@@ -376,7 +421,7 @@ For each search result used, record: **source name, date, the specific claim or 
 
 ### Step 0d — Draft the content brief
 
-Write a structured brief covering all four BP teams. For each team write **2–3 arguments**, each argument must have all four parts:
+Write a structured brief covering all four BP teams. For each team write **at least 2–3 arguments**; if your research surfaces more distinct, well-sourced arguments, include them all. Each argument must have all four parts:
 
 ```
 CLAIM      — one sentence stating what is true
@@ -388,7 +433,7 @@ IMPACT     — what concretely breaks down if this argument is lost; who suffers
 ```
 
 Also write:
-- **2–3 key clashes** — the central tensions where the teams' arguments directly collide
+- **At least 2–3 key clashes** — the central tensions where the teams' arguments directly collide. If more distinct clash points exist, document all of them.
 - **CG and CO extension angles** — what genuinely new ground each closing bench can add beyond opening
 
 ### Step 0e — Adversarial critique
@@ -404,6 +449,8 @@ Re-read the brief and challenge every argument with these questions. Rewrite any
 
 After revisions, the brief is locked. All `.arg` card content, pull quotes, clash slides, and stat figures in the HTML **must come directly from this brief**. DB-sourced arguments and web-sourced evidence must both be present where available. Do not invent new content during templating.
 
+> **Critical:** Do not truncate, compress, or omit any content from the locked brief to fit a perceived slide budget. If the brief contains 15 arguments, 6 clashes, and 8 pieces of evidence, generate enough slides to present every single one. Slide count is a consequence of content depth, never a constraint.
+
 ---
 
 ## Generation Workflow
@@ -414,7 +461,7 @@ Follow these steps when generating any standard slide deck.
 
 1. **Locate scripts** — resolve `$SLIDEGEN` using the path-detection block above (repo path first, installed path fallback).
 2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 84 blocks and pick the groups you need.
-3. **Plan** — decide which group files suit the topic and deck type; list them (e.g. `group-a.html` → `group-c.html`). For Case File / Reference decks, map each brief argument to a specific block.
+3. **Plan** — decide which group files suit the topic and deck type; list them (e.g. `group-a.html` → `group-c.html`). For Case File / Reference decks, map each brief argument to a specific block. There is no slide budget — if the brief contains 20 distinct points, plan 20+ slides. Never merge or drop arguments to save space.
 4. **Embed images** — run the embed script with the `--url` flag to write CDN URLs to files (default, fast):
    ```bash
    python3 "$SLIDEGEN/embed-images.py" --url \

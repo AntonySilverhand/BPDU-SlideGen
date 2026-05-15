@@ -208,7 +208,7 @@ Briefing-document style. Dark title/closing, amber accent for the central clash,
 
 #### 3. Event host deck (`event-host-deck.html`)
 **Designed for live projection.** Host talks; slide is a visual anchor. Key rules:
-- **One idea per slide.** Maximum 3–4 items total per slide.
+- **One idea per slide.** Aim for 3–4 focal items per slide so the host can talk to it, but if the content demands more, add slides rather than cramming.
 - **Text is massive.** `.hero` = `clamp(2.2rem,6vw,5.5rem)`. Readable from 5 metres.
 - **Centred layout.** `.inner` uses `align-items:center; text-align:center`.
 - **Alternating backgrounds** create rhythm: dark → light → amber → ...
@@ -216,7 +216,7 @@ Briefing-document style. Dark title/closing, amber accent for the central clash,
 - **Scale-based transitions** (`scale(.97)` → `scale(1)`), not translateX.
 - **Live badge** in brand bar signals "this is a live event deck".
 
-Standard 11-slide flow: `Welcome → Motion → How It Works → Four Teams → Speaking Order → POIs → Judging Criteria → Extension Rule → Prep Time → Good Luck → After the Round`
+**Typical flow (example, not a limit):** `Welcome → Motion → How It Works → Four Teams → Speaking Order → POIs → Judging Criteria → Extension Rule → Prep Time → Good Luck → After the Round`. If the event has extra segments (e.g. guest speaker, Q&A, sponsor thanks), append them. The deck expands to fit the content.
 
 #### 4. Meet the Teachers deck
 Public-facing guest event style. Blends theatrical projection with informative biographies and concept breakdowns. Uses `.teacher-card` and `.motion-anatomy` blocks.
