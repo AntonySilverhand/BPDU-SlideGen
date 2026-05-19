@@ -21,7 +21,8 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
     2. **Case File**: Briefing style, dark accents, focused on a specific motion.
     3. **Event Host**: Projection-ready, massive text, alternating backgrounds, live event features.
     4. **Experience Sharing**: Elegant, warm, personal-presentation style. Editorial serif headings, cream backgrounds, reveal animations, floating decorative shapes, tip cards, score cards, QR contact slides.
-    5. **Invitation Letter / Email**: Branded HTML email for inviting panelists, judges, guests, or participants to BPDU events. Table-based layout with inline CSS for maximum email client compatibility.
+    5. **Simplicity**: Ultra-minimal, dark-background, keyword-chip style. One idea per slide. Handwritten hero title, massive centered text, no cards or grids.
+    6. **Invitation Letter / Email**: Branded HTML email for inviting panelists, judges, guests, or participants to BPDU events. Table-based layout with inline CSS for maximum email client compatibility.
 - **Outline (Optional):** Specific points or slides requested.
 
 ## Input Parsing & Auto-Routing
@@ -36,6 +37,7 @@ The user does not need to remember hashtags or keywords. They speak naturally (e
 |---|---|
 | "email," "invite," "letter," " invitation" | Invitation Email |
 | "experience sharing," "my IELTS journey," "talk about," "workshop on my..." | Experience Sharing |
+| "simplicity," "minimal," "keyword chips," "short deck," "quick intro," "icebreaker" | Slide Deck → Simplicity |
 | "case file," "briefing on," "motion analysis" | Slide Deck → Case File |
 | "event host," "hosting," "live event," "projection" | Slide Deck → Event Host |
 | "reference," "rules," "guide," "training" | Slide Deck → Reference |
@@ -235,6 +237,7 @@ Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[eve
 - **Event Host**: Projection-ready, massive text (`.hero`), alternating backgrounds, live event features.
 - **Meet the Teachers**: Public-facing guest event style. Blends theatrical projection with informative biographies and concept breakdowns.
 - **Experience Sharing**: Elegant personal-presentation style. Warm cream backgrounds (`var(--bg-warm)`), editorial serif feel (`'Lora'`), generous whitespace, floating decorative shapes, reveal animations with stagger. Designed for talks, workshops, and storytelling — one idea per slide, tip cards for advice, score cards for metrics, promo cards for CTAs, QR cards for contact. Always uses `__THEME_URI__` on title and closing slides with `.illo` / `.closing-illo`.
+- **Simplicity**: Ultra-minimal dark deck. Handwritten hero title (`'Beth Ellen'` cursive), massive centered question text, keyword chips with `.min-keyword` / `.min-keyword.hl`. No cards, no grids, no complex layouts. Background: `var(--bg-dark)` on every slide. Brand bar dark variant.
 
 ### Mandatory Brand Bar HTML
 ```html
@@ -455,7 +458,7 @@ After revisions, the brief is locked. All `.arg` card content, pull quotes, clas
 
 ## Generation Workflow
 
-### Workflow A — Slide Deck (Reference / Case File / Event Host / Meet the Teachers)
+### Workflow A — Slide Deck (Reference / Case File / Event Host / Meet the Teachers / Simplicity)
 
 Follow these steps when generating any standard slide deck.
 
@@ -518,7 +521,102 @@ Follow these steps when generating any standard slide deck.
 
    > ⚠️ **If the file stays at placeholder size after injection** (e.g. `__LOGO_URI__` still visible in the source), the `.illo` or `.closing-illo` elements were missing from the HTML. Go back, add them to the title and closing slides, re-save, and re-run the inject script.
 
-### Workflow B — Experience Sharing Deck
+### Workflow B — Simplicity Deck
+
+Follow Workflow A steps 1–9, with these modifications:
+
+- **Step 2 (Catalog):** Ignore the block catalog. Simplicity decks do not use the group template library — they use only the minimal CSS classes defined below.
+- **Step 4 (Embed images):** Optional. Simplicity decks may omit the theme illustration entirely for an even smaller file. If used, inject only the logo URI.
+- **Step 5 (CSS):** Do not copy group template CSS. Use **only** the base `:root` tokens, the base navigation chrome, and the **Simplicity Extra CSS** below.
+- **Step 5 (Fonts):** Load `'Beth Ellen'` via `@font-face` (fallback: `cursive`) and `'Poppins'` for labels/body.
+- **Step 6 (HTML):** Every `.slide` gets `background: var(--bg-dark)`. Every `.inner` gets `class="inner center"`. Use only these classes per slide:
+  - Title slide: `.min-label` + `.min-hero` + `.min-sub`
+  - Question slides: `.min-label` + `.min-question` + `.min-keywords` containing `.min-keyword` spans (add `.hl` to the primary keyword)
+  - Closing slide: `.min-hero` + `.min-sub`
+- **Step 7 (JS):** Use the standard navigation JS verbatim.
+- **Step 8 (Save):** Use a descriptive name like `tmp/simplicity-[topic-slug].html`.
+
+**Simplicity Extra CSS (add to `<style>` after base tokens):**
+
+```css
+/* Dark brand bar variant */
+.brand-bar {
+  background: rgba(20, 14, 6, 0.88);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.brand-bar-name, .brand-bar-slide-tag { color: rgba(255,255,255,0.85); }
+
+/* Beth Ellen handwritten hero */
+@font-face {
+  font-family: "Beth Ellen";
+  font-style: normal;
+  font-weight: 400;
+  font-display: fallback;
+  src: url('https://antony.bpdebate.club/wp-content/themes/impressionist/assets/fonts/beth-ellen_normal_400.ttf') format('truetype');
+}
+
+.min-hero {
+  font-family: 'Beth Ellen', cursive;
+  font-size: clamp(2.2rem, 6vw, 5rem); font-weight: 400;
+  line-height: 1.15; color: white; text-align: center;
+}
+.min-label {
+  font-size: clamp(10px, 1.2vw, 12px);
+  font-weight: 700; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--primary);
+  margin-bottom: clamp(16px, 2.5vh, 24px);
+}
+.min-question {
+  font-size: clamp(1.6rem, 3.8vw, 3.6rem);
+  font-weight: 800; line-height: 1.15; color: white;
+  max-width: 900px; text-align: center;
+}
+.min-keywords {
+  display: flex; flex-wrap: wrap; gap: clamp(10px, 1.5vw, 16px);
+  justify-content: center; margin-top: clamp(20px, 3vh, 36px);
+}
+.min-keyword {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(248,248,248,0.2);
+  color: rgba(255,255,255,0.92);
+  font-size: clamp(1rem, 2.2vw, 1.6rem); font-weight: 700;
+  padding: clamp(8px, 1.4vh, 14px) clamp(16px, 2.4vw, 28px);
+  border-radius: 999px; backdrop-filter: blur(8px);
+}
+.min-keyword.hl {
+  background: var(--primary); color: var(--bg-dark); border-color: var(--primary);
+}
+.min-sub {
+  font-size: clamp(0.9rem, 1.6vw, 1.2rem); color: rgba(255,255,255,0.55);
+  margin-top: clamp(10px, 1.8vh, 16px); text-align: center;
+}
+```
+
+**Simplicity HTML pattern:**
+
+```html
+<section class="slide active" id="s1" data-tag="Title">
+  <div class="inner center">
+    <p class="min-label a">Topic Category</p>
+    <h1 class="min-hero a">Main Title</h1>
+    <p class="min-sub a">Subtitle — Speaker Name</p>
+  </div>
+</section>
+
+<section class="slide" id="s2" data-tag="Question">
+  <div class="inner center">
+    <p class="min-label a">Question 1</p>
+    <h2 class="min-question a">What kind of ...?</h2>
+    <div class="min-keywords a">
+      <span class="min-keyword hl">Primary Answer</span>
+      <span class="min-keyword">Secondary</span>
+      <span class="min-keyword">Tertiary</span>
+    </div>
+  </div>
+</section>
+```
+
+### Workflow C — Experience Sharing Deck
 
 Follow Workflow A steps 1–9, with these modifications:
 
@@ -528,7 +626,7 @@ Follow Workflow A steps 1–9, with these modifications:
 - **Step 7 (JS):** Append the **Counter Animation** JS snippet from the appendix below. Use `data-counter="7.5"` on score elements.
 - **Step 8 (Save):** Use a descriptive name like `tmp/experience-[topic-slug].html`.
 
-### Workflow C — Invitation Email
+### Workflow D — Invitation Email
 
 1. **Read skeleton** — read `skills/slidegen/email-skeleton.html` for the complete table-based email structure.
 2. **Fill placeholders** — replace all bracketed placeholders (`[Event Name]`, `[Recipient Name]`, `[Sender Name]`, etc.) with real content.
@@ -539,7 +637,7 @@ Follow Workflow A steps 1–9, with these modifications:
 
 ## Output
 Produce the complete HTML code for the requested presentation or email as a single file. Save it to `tmp/` with a descriptive filename:
-- Slide decks: `tmp/casefile-[motion-slug].html`, `tmp/eventhost-[event-slug].html`, `tmp/experience-[topic-slug].html`
+- Slide decks: `tmp/casefile-[motion-slug].html`, `tmp/eventhost-[event-slug].html`, `tmp/experience-[topic-slug].html`, `tmp/simplicity-[topic-slug].html`
 - Emails: `tmp/invite-[event]-[role].html`
 
 > ⚠️ **Never run any git commands.** Do not commit, stage, push, or modify git history at any point. Git operations are exclusively the user's responsibility.
