@@ -1,8 +1,8 @@
 ---
 name: slidegen
 description: |
-  Generates a branded BPDU HTML slide deck, case file, event host deck, experience sharing deck, or invitation email.
-  Use when the user asks for slides, a presentation, a case file, an event host deck, an experience sharing deck, or a BPDU-branded email invitation.
+  Generates a branded BPDU HTML slide deck, case file, event host deck, experience sharing deck, language course artifact, or invitation email.
+  Use when the user asks for slides, a presentation, a case file, an event host deck, an experience sharing deck, a language/course learning deck, or a BPDU-branded email invitation.
   Do NOT use for plain text outlines, PDF generation, or non-BPDU-branded content.
 allowed-tools: Bash(python3 *), Read, Write
 metadata:
@@ -22,7 +22,8 @@ Generate a single-file, self-contained HTML slide presentation following the BP 
     3. **Event Host**: Projection-ready, massive text, alternating backgrounds, live event features.
     4. **Experience Sharing**: Elegant, warm, personal-presentation style. Editorial serif headings, cream backgrounds, reveal animations, floating decorative shapes, tip cards, score cards, QR contact slides.
     5. **Simplicity**: Ultra-minimal, dark-background, keyword-chip style. One idea per slide. Handwritten hero title, massive centered text, no cards or grids.
-    6. **Invitation Letter / Email**: Branded HTML email for inviting panelists, judges, guests, or participants to BPDU events. Table-based layout with inline CSS for maximum email client compatibility.
+    6. **Language Course Artifact**: Compact course/learning deck with image vocabulary cards, short bilingual or target-language sentences, a serif editorial heading, mobile dots, and optional sentence-review overlay.
+    7. **Invitation Letter / Email**: Branded HTML email for inviting panelists, judges, guests, or participants to BPDU events. Table-based layout with inline CSS for maximum email client compatibility.
 - **Outline (Optional):** Specific points or slides requested.
 
 ## Input Parsing & Auto-Routing
@@ -37,6 +38,7 @@ The user does not need to remember hashtags or keywords. They speak naturally (e
 |---|---|
 | "email," "invite," "letter," " invitation" | Invitation Email |
 | "experience sharing," "my IELTS journey," "talk about," "workshop on my..." | Experience Sharing |
+| "Spanish course," "language lesson," "vocabulary," "bilingual," "course artifact," "simple sentences" | Language Course Artifact |
 | "simplicity," "minimal," "keyword chips," "short deck," "quick intro," "icebreaker" | Slide Deck → Simplicity |
 | "case file," "briefing on," "motion analysis" | Slide Deck → Case File |
 | "event host," "hosting," "live event," "projection" | Slide Deck → Event Host |
@@ -94,7 +96,7 @@ When generating training decks, strategy guides, or coaching materials, read `sk
 
 ## Template Library (canonical CSS + HTML source)
 
-`slide-templates.html` in `skills/slidegen/assets/` is the **canonical block library** — 84 live, rendered layout blocks. For agent use, read the smaller **per-group files** in `skills/slidegen/assets/templates/` instead. Each group file is a self-contained HTML preview containing the full CSS plus only that group's blocks. Use the monolithic `slide-templates.html` only as a browser preview or when you need the complete library in one file.
+`slide-templates.html` in `skills/slidegen/assets/` is the **canonical block library** — 88 live, rendered layout blocks. For agent use, read the smaller **per-group files** in `skills/slidegen/assets/templates/` instead. Each group file is a self-contained HTML preview containing the full CSS plus only that group's blocks. Use the monolithic `slide-templates.html` only as a browser preview or when you need the complete library in one file.
 
 ### Available scripts
 
@@ -140,6 +142,7 @@ Once you know which blocks you need (e.g. A1 title, B1 stats, C3 argument cards)
 | **G — Creative III** | s47–s58 | Honey Pro, 3D stack, Heatmap, Web of tension, Dashboard, Keyhole, Architecture, Pulse, Steps, Table, Glass stakeholder, Final accent |
 | **H — Creative IV** | s59–s72 | Bubbles, Progress rings, Glass dash, Lightning, Checkgrid, Shadow cards, Roadmap, Prism, Pendulum, Glass list, Cycle, Split hero, Floating cards, Summary grid |
 | **I — Experience Sharing** | s73–s84 | Title experience, Self-intro, TOC, Tip cards, Big score, Philosophy diagram, Dark pillars, Promo cards, QR contact, Intro greeting, Two-path split, Contact closing |
+| **J — Language Course** | s85–s87 | Course image-card page, sentence-review overlay page, course closing |
 
 ### Reusable Slide Layout Types
 Use these layout classes to vary the presentation (all CSS is in every group file):
@@ -238,6 +241,7 @@ Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[eve
 - **Meet the Teachers**: Public-facing guest event style. Blends theatrical projection with informative biographies and concept breakdowns.
 - **Experience Sharing**: Elegant personal-presentation style. Warm cream backgrounds (`var(--bg-warm)`), editorial serif feel (`'Lora'`), generous whitespace, floating decorative shapes, reveal animations with stagger. Designed for talks, workshops, and storytelling — one idea per slide, tip cards for advice, score cards for metrics, promo cards for CTAs, QR cards for contact. Always uses `__THEME_URI__` on title and closing slides with `.illo` / `.closing-illo`.
 - **Simplicity**: Ultra-minimal dark deck. Handwritten hero title (`'Beth Ellen'` cursive), massive centered question text, keyword chips with `.min-keyword` / `.min-keyword.hl`. No cards, no grids, no complex layouts. Background: `var(--bg-dark)` on every slide. Brand bar dark variant.
+- **Language Course Artifact**: Compact learning deck based on `wenzhou-en-espanol.html`: warm paper background, `Cardo` serif headings, `Inter` body, `.page-head` plus `.course-grid4` image vocabulary cards, mobile dot navigation, and optional `.sentence-view` overlay for review sentences. Use this for Spanish/course artifacts, vocabulary modules, city/culture primers, and simple bilingual lessons.
 
 ### Mandatory Brand Bar HTML
 ```html
@@ -458,12 +462,12 @@ After revisions, the brief is locked. All `.arg` card content, pull quotes, clas
 
 ## Generation Workflow
 
-### Workflow A — Slide Deck (Reference / Case File / Event Host / Meet the Teachers / Simplicity)
+### Workflow A — Slide Deck (Reference / Case File / Event Host / Meet the Teachers / Simplicity / Language Course Artifact)
 
 Follow these steps when generating any standard slide deck.
 
 1. **Locate scripts** — resolve `$SLIDEGEN` using the path-detection block above (repo path first, installed path fallback).
-2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 84 blocks and pick the groups you need.
+2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 88 blocks and pick the groups you need.
 3. **Plan** — decide which group files suit the topic and deck type; list them (e.g. `group-a.html` → `group-c.html`). For Case File / Reference decks, map each brief argument to a specific block. There is no slide budget — if the brief contains 20 distinct points, plan 20+ slides. Never merge or drop arguments to save space.
 4. **Embed images** — run the embed script with the `--url` flag to write CDN URLs to files (default, fast):
    ```bash
@@ -614,6 +618,51 @@ Follow Workflow A steps 1–9, with these modifications:
     </div>
   </div>
 </section>
+```
+
+### Workflow B2 — Language Course Artifact
+
+Use this workflow for course or vocabulary decks, including examples like `wenzhou-en-espanol.html`.
+
+- **Step 2 (Catalog):** Use Group J blocks (`s85`-`s87`) from `skills/slidegen/assets/templates/group-j.html`.
+- **Step 4 (Images):** Course topic cards must use injected CDN URLs or base64 data URIs. Do not leave relative asset paths like `lesson-assets/01.png` in final output. If the user supplies or requests generated images, inject those final URLs/data URIs into each `.course-card img`.
+- **Step 5 (CSS):** Include the Course Artifact CSS from `group-j.html`, including `Cardo` + `Inter` fonts, `.course-page`, `.course-grid4`, `.course-card`, `.sentence-view`, `.mobile-dots`, and the responsive rules.
+- **Step 6 (HTML):** Each content slide uses `.course-page` with one `.page-head` and a `.course-grid4` of exactly 3-4 `.course-card` items. Keep sentence text short enough for language learners: 1-2 simple lines per card.
+- **Step 7 (JS):** Use Course Artifact JS, not the reference-deck JS. It updates `#slideTag`, `#counter`, `#progress`, `.mobile-dot`, supports swipe, and lets `ArrowUp` open the sentence-review overlay and `ArrowDown` close it.
+- **Step 8 (Save):** Use `tmp/course-[topic-slug].html` or `tmp/[language]-course-[topic-slug].html`.
+
+**Course Artifact HTML pattern:**
+
+```html
+<section class="slide course-page active" id="s1" data-tag="01 / Ciudad">
+  <main class="inner">
+    <div class="page-head a">
+      <p class="tag">01 / Ciudad</p>
+      <h1>Wenzhou hoy</h1>
+      <p class="sub">Una ciudad con rio, trabajo y vida.</p>
+    </div>
+    <div class="course-grid4">
+      <article class="course-card a">
+        <img src="__CARD_IMAGE_1__" alt="Rio">
+        <div class="course-copy">
+          <h2>Rio</h2>
+          <p>El rio es largo.<br>Hay luz suave.</p>
+        </div>
+      </article>
+    </div>
+  </main>
+</section>
+```
+
+**Course sentence overlay pattern:**
+
+```html
+<div class="sentence-view" id="sentenceView" aria-hidden="true">
+  <section class="sentence-panel" aria-live="polite">
+    <h2 id="sentenceTitle"></h2>
+    <ul id="sentenceList"></ul>
+  </section>
+</div>
 ```
 
 ### Workflow C — Experience Sharing Deck
