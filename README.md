@@ -2,27 +2,29 @@
 
 > 中文版：[:link: README.zh-CN.md](README.zh-CN.md)
 
-A set of [Claude Code](https://claude.ai/code) agent skills for generating self-contained HTML slide presentations in the BP Debate Union visual style.
+A set of [Claude Code](https://claude.ai/code) agent skills for generating single-file HTML slide presentations in the BP Debate Union visual style.
 
-Think PowerPoint, but in HTML — fully keyboard-navigable, no build step, single-file output.
+Think PowerPoint, but in HTML — keyboard-navigable, no build step, and easy to edit.
 
 ## Skills
 
 | Skill | Trigger | What it does |
 |-------|---------|--------------|
 | `deep-analysis` | *"Analyze the motion..."* | Strategic, layered analysis of a BP motion (stakeholders, clashes, cases) |
-| `slidegen` | *"Generate a slide deck on…"* | Produces a branded, single-file HTML presentation, case file, event host deck, or invitation email |
+| `slidegen` | *"Generate a slide deck on…"* | Produces a branded HTML presentation, case file, event host deck, experience sharing deck, or invitation email |
 | `imagegen` | *"Generate an illustration for…"* | Creates or edits images via the Gemini API in the BPDU flat-cartoon style |
 
 ## Output
 
-Every generated deck is a **single `.html` file** (~20–80 KB) with:
+Generated slide decks are **single `.html` files** (~20–80 KB with CDN assets) with:
 - Keyboard navigation (`←` `→` `Space`) and touch swipe
 - Slide counter and progress bar
 - Fixed BPDU brand bar on every slide
 - Brand images loaded from `bpdebate.club` CDN (internet connection required)
 
-> **v1.0.0 change:** Images are now loaded from hosted URLs instead of being base64-embedded. Files are ~50× smaller. For offline use, run `embed-images.py` in base64 mode.
+Invitation emails are also single HTML files, but use table-based inline CSS for email-client compatibility instead of slide navigation.
+
+> **v1.0.0 change:** Slide brand images are loaded from hosted URLs by default instead of being base64-embedded. Files are ~50× smaller. For offline use, run `embed-images.py` in base64 mode.
 
 ## Installation
 
@@ -52,33 +54,32 @@ All three require **Node.js 20+**.
 
 ### Step 2 — Install the skills
 
-**Option A: Built-in Claude Code Install (Recommended)**
+Claude Code discovers plain skills from `~/.claude/skills`. This repository is currently a skills package, not a Claude Code marketplace plugin.
 
-Run this command inside the Claude Code prompt:
-```
-/plugins install https://github.com/AntonySilverhand/BPDU-SlideGen
-```
-*Note: This will install all skills in this repository.*
+**Option A: Local symlink (Recommended for developers)**
 
-**Option B: Manual Symlink (For Developers)**
-
-If you have cloned the repository locally and want to sync changes as you edit:
+Clone the repository, then link the skills so edits take effect immediately:
 ```bash
+git clone https://github.com/AntonySilverhand/BPDU-SlideGen.git
+cd BPDU-SlideGen
 ./scripts/symlink.sh
+```
+
+**Option B: Manual copy**
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R skills/deep-analysis skills/slidegen skills/imagegen ~/.claude/skills/
 ```
 
 **Option C: Individual Skills (via agentskill.sh)**
 
-If you only need specific skills:
+If you use the `ags` CLI and only need specific skills:
 ```bash
 ags install AntonySilverhand/BPDU-SlideGen@deep-analysis
 ags install AntonySilverhand/BPDU-SlideGen@slidegen
 # ... etc
 ```
-
-**Manually**
-
-Clone or download this repo and copy the `skills/` directory into your project root.
 
 ---
 
@@ -101,18 +102,19 @@ pip install requests
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/embed-images.py` | Writes brand image URIs to `.logo_uri.txt` / `.theme_uri.txt`. Default mode encodes base64; use `--url` for CDN URLs. |
-| `scripts/validate.py` | Post-generation validation: checks brand bar, `.illo`, `CONFIG`, file size, etc. |
+| `skills/slidegen/scripts/catalog.py` | Prints the compact catalog of canonical slide template blocks. |
+| `skills/slidegen/scripts/embed-images.py` | Writes brand image URIs to `.logo_uri.txt` / `.theme_uri.txt`. Script default encodes base64; use `--url` for CDN URLs. |
+| `skills/slidegen/scripts/validate.py` | Post-generation validation: checks brand bar, `.illo`, `CONFIG`, file size, etc. |
 
 ### Image embedding modes
 
 ```bash
-# CDN mode (default, v1.0+) — files stay ~20–80 KB
+# CDN mode (recommended for v1.0+) — files stay ~20–80 KB
 python3 skills/slidegen/scripts/embed-images.py --url \
   https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png \
   https://bpdebate.club/wp-content/uploads/2025/12/Untitled-design-3-1.png
 
-# Base64 mode — for fully offline decks (~2.7 MB)
+# Base64 mode (script default) — for fully offline decks (~2.7 MB)
 python3 skills/slidegen/scripts/embed-images.py
 ```
 
@@ -123,6 +125,7 @@ python3 skills/slidegen/scripts/embed-images.py
 | **Reference** | Dense reading material, debate rules | ~30–50 KB |
 | **Case File** | Motion briefing, argument cards, clash analysis | ~30–60 KB |
 | **Event Host** | Live projection, one idea per slide, massive text | ~15–30 KB |
+| **Experience Sharing** | Workshops, personal talks, storytelling, QR contact slides | ~30–60 KB |
 | **Invitation / Email** | HTML email invites for panelists, judges, guests | ~15–25 KB |
 
 ## Usage
@@ -139,6 +142,10 @@ Generate a case file deck on the motion "This House Would ban social media for u
 
 ```
 Generate an event host deck for our weekly round on May 23
+```
+
+```
+Generate an experience sharing deck about my IELTS journey
 ```
 
 ```
@@ -167,13 +174,23 @@ Full spec in [`CLAUDE.md`](./CLAUDE.md).
 
 ## Changelog
 
+### v2.0.0 — 2026-06-05
+
+- **Natural-language auto-routing:** `slidegen` now infers output type, speed mode, and debate/general domain from normal user prompts.
+- **Experience Sharing deck type:** Added a warm personal-presentation workflow for workshops, talks, storytelling decks, score slides, promo cards, and QR contact endings.
+- **Expanded template library:** Reorganized templates into `group-a.html` through `group-i.html`; the current catalog has 85 rendered blocks.
+- **Debate strategy integration:** Added `debate-strategy.md` and routing rules for BP strategy guides, prep strategy, PM speeches, and closing-bench constraints.
+- **Content completeness workflow:** Added Phase 0 brief generation, locked-brief rules, and stronger safeguards against dropping arguments or evidence to fit slide counts.
+- **Canonical email skeleton:** Moved invitation email structure into `skills/slidegen/email-skeleton.html` for reuse.
+- **Contributor and install docs:** Added `AGENTS.md`, refreshed both READMEs, and fixed the developer symlink script to link only maintained skills.
+
 ### v1.0.0 — 2026-05-11
 
 - **CDN-first images:** Brand assets now load from `bpdebate.club` URLs instead of base64 embedding. Generated files are ~50× smaller (~20–80 KB vs ~2.7–5.3 MB).
 - **`embed-images.py --url`:** New flag to write hosted URLs to `.logo_uri.txt` / `.theme_uri.txt`. Base64 mode still available for offline use.
 - **`validate.py`:** New post-generation validation script. Checks brand bar, `.illo`/`.closing-illo`, `CONFIG` for event decks, no `display:none` on `.slide`, and file size sanity.
 - **Invitation Letter / Email deck type:** Added branded HTML email generation for panelist/judge/participant invites.
-- **SKILL.md hardening:** Added `anti-triggers`, `allowed-tools`, `metadata`, negative constraints, and a "Before you finish" validation checklist.
+- **SKILL.md hardening:** Added `allowed-tools`, `metadata`, negative constraints, and a "Before you finish" validation checklist.
 - **Simplified workflow:** Removed the placeholder + injection step. URLs are written directly into generated HTML.
 - **Batch-fixed existing files:** 16 existing HTML decks updated from base64 to URLs.
 - **Removed deprecated skills:** `slide-theme` and `slide-export-tips` are no longer maintained. Theme application is now built into `slidegen`; export advice is superseded by the validation workflow.
@@ -182,7 +199,7 @@ Full spec in [`CLAUDE.md`](./CLAUDE.md).
 
 - Initial skill set with `slidegen`, `deep-analysis`, `slide-theme`, `slide-export-tips`, and `imagegen`.
 - Base64-embedded brand images for fully self-contained offline decks.
-- 73-block template library (`slide-templates.html`).
+- Earlier template library for `slide-templates.html`; the current catalog has 85 rendered blocks.
 
 ---
 

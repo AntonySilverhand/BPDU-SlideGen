@@ -20,7 +20,7 @@ if [ ! -d "$SKILLS_DIR" ]; then
 fi
 
 # List of skills in this repo
-SKILLS=("deep-analysis" "imagegen" "slide-export-tips" "slidegen" "slide-theme")
+SKILLS=("deep-analysis" "imagegen" "slidegen")
 
 for SKILL in "${SKILLS[@]}"; do
     TARGET="$SKILLS_DIR/$SKILL"

@@ -7,12 +7,12 @@ description: |
 allowed-tools: Bash(python3 *), Read, Write
 metadata:
   author: BP Debate Union
-  version: "1.0"
+  version: "2.0"
 ---
 
 # SlideGen: Branded HTML Slide Generator
 
-Generate a single-file, self-contained HTML slide presentation following the BP Debate Union (BPDU) design system.
+Generate a single-file HTML slide presentation following the BP Debate Union (BPDU) design system.
 
 ## Input Context
 - **Topic/Motion:** The subject of the presentation.
@@ -92,12 +92,12 @@ When generating training decks, strategy guides, or coaching materials, read `sk
 
 ## Template Library (canonical CSS + HTML source)
 
-`slide-templates.html` in `skills/slidegen/assets/` is the **canonical block library** — 84 live, rendered layout blocks. For agent use, read the smaller **per-group files** in `skills/slidegen/assets/templates/` instead. Each group file is a self-contained HTML preview containing the full CSS plus only that group's blocks. Use the monolithic `slide-templates.html` only as a browser preview or when you need the complete library in one file.
+`slide-templates.html` in `skills/slidegen/assets/` is the **canonical block library** — 85 live, rendered layout blocks. For agent use, read the smaller **per-group files** in `skills/slidegen/assets/templates/` instead. Each group file is a self-contained HTML preview containing the full CSS plus only that group's blocks. Use the monolithic `slide-templates.html` only as a browser preview or when you need the complete library in one file.
 
 ### Available scripts
 
 - **`scripts/catalog.py`** — Parses `slide-templates.html` and prints a compact block catalog (ID, name, background, CSS classes).
-- **`scripts/embed-images.py`** — Writes image URIs to `.logo_uri.txt` / `.theme_uri.txt`. Default mode writes CDN URLs (`--url` flag). Base64 mode (`--base64` or no flag) encodes local PNGs as data URIs for fully offline decks.
+- **`scripts/embed-images.py`** — Writes image URIs to `.logo_uri.txt` / `.theme_uri.txt`. Use `--url` to write CDN URLs for small online decks. With no flag, the script encodes local PNGs as base64 data URIs for fully offline decks.
 
 ### Locating the scripts
 
@@ -238,7 +238,7 @@ Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[eve
 
 ### Mandatory Brand Bar HTML
 ```html
-<!-- src is either a CDN URL (default, fast) or a base64 data URI (offline mode) -->
+<!-- src is either a CDN URL (recommended, fast) or a base64 data URI (offline mode) -->
 <header class="brand-bar">
   <img src="__LOGO_URI__" alt="BPDU">
   <span class="brand-bar-name">BP Debate Union</span>
@@ -460,9 +460,9 @@ After revisions, the brief is locked. All `.arg` card content, pull quotes, clas
 Follow these steps when generating any standard slide deck.
 
 1. **Locate scripts** — resolve `$SLIDEGEN` using the path-detection block above (repo path first, installed path fallback).
-2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 84 blocks and pick the groups you need.
+2. **Catalog** — run `python3 "$SLIDEGEN/catalog.py"` to see all 85 blocks and pick the groups you need.
 3. **Plan** — decide which group files suit the topic and deck type; list them (e.g. `group-a.html` → `group-c.html`). For Case File / Reference decks, map each brief argument to a specific block. There is no slide budget — if the brief contains 20 distinct points, plan 20+ slides. Never merge or drop arguments to save space.
-4. **Embed images** — run the embed script with the `--url` flag to write CDN URLs to files (default, fast):
+4. **Embed images** — run the embed script with the `--url` flag to write CDN URLs to files (recommended, fast):
    ```bash
    python3 "$SLIDEGEN/embed-images.py" --url \
      https://bpdebate.club/wp-content/uploads/2025/05/cropped-ChatGPT-Image-May-8-2025-10_18_18-PM.png \
