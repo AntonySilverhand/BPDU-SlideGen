@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BPDU SlideGen — Group J Course Artifact Templates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #F5C230; --primary-light: #FFF6D6; --primary-dark: #C49A00;
+      --bg: #FFFFFF; --bg-warm: #FFFDF5; --bg-dark: #1A1207;
+      --text: #1A1A1A; --muted: #6B6B6B; --border: #EDE9DC;
+      --paper: #FAFAE1; --course-green: #7BDCB5; --course-pink: #FAACA8;
+      --radius: 8px; --font: 'Inter', system-ui, sans-serif; --font-display: 'Cardo', Georgia, serif;
+      --bar: 48px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    html, body { width: 100%; height: 100%; overflow: hidden }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); -webkit-font-smoothing: antialiased }
+    .brand-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: var(--bar); z-index: 300;
+      display: flex; align-items: center; gap: clamp(8px,1.4vw,12px);
+      padding: 0 clamp(16px,3vw,32px);
+      background: rgba(255,255,255,.9); border-bottom: 1px solid rgba(237,233,220,.82);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    }
+    .brand-bar img { width: clamp(26px,2.2vw,30px); height: clamp(26px,2.2vw,30px); border-radius: 7px; flex-shrink: 0 }
+    .brand-bar-name { font-size: clamp(10px,1vw,12px); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap }
+    .brand-bar-dot { width: 4px; height: 4px; border-radius: 999px; background: var(--border); flex-shrink: 0 }
+    .brand-bar-slide-tag { font-size: clamp(10px,1vw,12px); color: var(--muted) }
+    .lib-badge {
+      margin-left: auto; display: inline-flex; align-items: center;
+      background: var(--primary-light); color: var(--primary-dark);
+      font-size: clamp(9px,.9vw,10px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+      padding: clamp(3px,.5vw,5px) clamp(8px,1.2vw,12px); border-radius: 999px; border: 1px solid rgba(196,154,0,.35);
+    }
+    .deck { position: relative; width: 100vw; height: 100vh; overflow: hidden }
+    .slide {
+      position: absolute; inset: 0; padding-top: var(--bar);
+      opacity: 0; pointer-events: none; transform: translateX(4%);
+      transition: opacity .38s ease, transform .38s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: all; transform: translateX(0) }
+    .slide.exit { opacity: 0; transform: translateX(-4%) }
+    .course-page {
+      background:
+        linear-gradient(90deg, rgba(250,250,225,.72), rgba(255,255,255,.94)),
+        radial-gradient(circle at 88% 18%, rgba(245,194,48,.18), transparent 28%),
+        radial-gradient(circle at 8% 82%, rgba(123,220,181,.18), transparent 24%);
+    }
+    .inner {
+      height: 100%; width: min(1220px,94vw); margin: 0 auto;
+      display: flex; flex-direction: column; justify-content: center;
+      gap: clamp(16px,2.2vh,28px); padding: clamp(16px,3vh,34px) 0;
+    }
+    .inner.center { align-items: center; text-align: center }
+    .page-head {
+      display: grid; grid-template-columns: 1fr auto; column-gap: clamp(18px,3vw,32px);
+      align-items: end; border-bottom: 1px solid var(--border);
+      padding-bottom: clamp(10px,1.6vh,18px);
+    }
+    .tag {
+      grid-column: 1 / -1; color: var(--muted); font-size: clamp(10px,1vw,12px);
+      letter-spacing: .14em; text-transform: uppercase; font-weight: 800;
+      margin-bottom: clamp(5px,.9vh,8px);
+    }
+    h1 {
+      font-family: var(--font-display); font-size: clamp(2.05rem,4.5vw,4.8rem);
+      line-height: .96; font-weight: 700; letter-spacing: 0;
+    }
+    h2 {
+      font-family: var(--font-display); font-size: clamp(1.15rem,1.65vw,1.65rem);
+      line-height: 1.05; margin-bottom: clamp(6px,.8vh,9px);
+    }
+    .sub {
+      max-width: 390px; justify-self: end; color: var(--muted);
+      font-size: clamp(.9rem,1.3vw,1.08rem); line-height: 1.45;
+      padding-bottom: clamp(3px,.5vh,6px);
+    }
+    .course-grid4 {
+      display: grid; grid-template-columns: repeat(4,minmax(0,1fr));
+      gap: clamp(12px,1.6vw,22px);
+    }
+    .course-card {
+      min-width: 0; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: 0 18px 45px rgba(36,33,33,.08);
+      display: flex; flex-direction: column;
+    }
+    .course-card img {
+      width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block;
+      border-bottom: 1px solid var(--border); background: var(--paper);
+    }
+    .course-copy { padding: clamp(12px,1.4vw,18px) }
+    .course-copy p { color: var(--muted); font-size: clamp(.78rem,1.05vw,.98rem); line-height: 1.42 }
+    .sentence-view {
+      position: fixed; inset: var(--bar) 0 0 0; z-index: 250;
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(22px,6vw,80px);
+      background:
+        linear-gradient(90deg, rgba(250,250,225,.96), rgba(255,255,255,.98)),
+        radial-gradient(circle at 15% 20%, rgba(245,194,48,.18), transparent 30%),
+        radial-gradient(circle at 82% 72%, rgba(123,220,181,.18), transparent 28%);
+      opacity: 0; pointer-events: none; transform: translateY(-10px);
+      transition: opacity .24s ease, transform .24s ease;
+    }
+    .sentence-view.visible { opacity: 1; pointer-events: all; transform: translateY(0) }
+    .sentence-panel {
+      width: min(900px,92vw); border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border); padding: clamp(28px,6vh,64px) 0;
+    }
+    .sentence-panel h2 {
+      font-family: var(--font-display); font-size: clamp(2rem,5vw,5rem);
+      line-height: 1; margin-bottom: clamp(22px,4vh,38px);
+    }
+    .sentence-panel ul { list-style: none; display: grid; gap: clamp(14px,2.5vh,24px) }
+    .sentence-panel li {
+      font-size: clamp(1.3rem,3vw,2.6rem); line-height: 1.25;
+      padding-left: clamp(18px,3vw,32px); border-left: clamp(4px,.6vw,6px) solid var(--primary);
+    }
+    .course-closing {
+      background: var(--bg-dark); color: white;
+      background-image: radial-gradient(circle at 20% 20%, rgba(245,194,48,.16), transparent 30%);
+    }
+    .course-closing h2 { font-size: clamp(2.4rem,6vw,6rem); color: white }
+    .course-closing .sub { justify-self: auto; max-width: 620px; color: rgba(255,255,255,.62); padding: 0 }
+    .mobile-dots {
+      position: fixed; left: 50%; bottom: clamp(10px,1.6vh,16px); transform: translateX(-50%);
+      z-index: 310; display: flex; align-items: center; gap: clamp(7px,1vw,9px);
+      padding: clamp(6px,.9vw,8px) clamp(8px,1.2vw,10px); border: 1px solid var(--border);
+      border-radius: 999px; background: rgba(255,255,255,.86); backdrop-filter: blur(12px);
+    }
+    .mobile-dot { width: 9px; height: 9px; border: 0; border-radius: 999px; background: #cfc8bd; padding: 0 }
+    .mobile-dot.active { width: 22px; background: var(--text) }
+    #progress { position: fixed; left: 0; bottom: 0; height: 3px; width: 0; background: var(--text); z-index: 300; transition: width .25s ease }
+    #counter { position: fixed; right: 22px; bottom: 14px; z-index: 300; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .08em }
+    .nav-btn { position: fixed; bottom: 8px; z-index: 300; border: 1px solid var(--border); background: rgba(255,255,255,.85); width: 32px; height: 28px; border-radius: 6px; cursor: pointer; color: var(--text); font-weight: 800 }
+    .nav-btn.prev { left: 22px } .nav-btn.next { left: 62px }
+    .tpl-label {
+      display: inline-block; background: rgba(0,0,0,.05); border: 1px solid rgba(0,0,0,.1);
+      border-radius: 5px; padding: 2px 8px; font-size: 9px; font-weight: 600; font-family: monospace;
+      color: var(--muted); letter-spacing: .01em; margin-bottom: 10px; line-height: 1.8;
+    }
+    .slide.active .a { animation: up .42s ease both }
+    .slide.active .a:nth-child(2) { animation-delay: .05s }
+    .slide.active .a:nth-child(3) { animation-delay: .10s }
+    .slide.active .a:nth-child(4) { animation-delay: .15s }
+    .slide.active .a:nth-child(5) { animation-delay: .20s }
+    @keyframes up { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
+    @media (min-width: 1300px) and (min-aspect-ratio: 16/9) {
+      .inner { width: min(1360px,92vw); gap: clamp(14px,1.8vh,24px) }
+      .course-card img { aspect-ratio: 16 / 10 }
+      h1 { font-size: clamp(2.5rem,4vw,5.1rem) }
+    }
+    @media (max-height: 760px) and (min-width: 920px) {
+      .inner { padding: clamp(12px,2vh,18px) 0; gap: clamp(12px,2vh,18px) }
+      .page-head { padding-bottom: clamp(8px,1.2vh,12px) }
+      .course-copy { padding: clamp(10px,1vw,12px) }
+      .course-copy p { line-height: 1.25 }
+      .course-card img { aspect-ratio: 16 / 9 }
+    }
+    @media (min-width: 700px) and (max-width: 1100px) and (orientation: portrait) {
+      .inner { width: min(860px,92vw); justify-content: start }
+      .course-grid4 { grid-template-columns: 1fr 1fr }
+      .course-card img { aspect-ratio: 4 / 3 }
+    }
+    @media (max-width: 900px) {
+      .inner { height: auto; min-height: calc(100vh - var(--bar)); justify-content: start }
+      .page-head { display: block }
+      .sub { margin-top: clamp(8px,1.5vh,12px); max-width: none }
+      .course-grid4 { grid-template-columns: 1fr 1fr }
+      .lib-badge { display: none }
+    }
+    @media (max-width: 560px) {
+      .course-grid4 { grid-template-columns: 1fr }
+      .brand-bar-slide-tag { display: none }
+      #counter { display: none }
+      .nav-btn { display: none }
+    }
+  </style>
+</head>
+<body>
+<header class="brand-bar">
+  <img src="BPDU_LOGO.png" alt="BPDU">
+  <span class="brand-bar-name">BP Debate Union</span>
+  <span class="brand-bar-dot"></span>
+  <span class="brand-bar-slide-tag" id="slideTag">J1 · Course Cards</span>
+  <span class="lib-badge">Group J</span>
+</header>
+<div class="deck">
+  <section class="slide course-page active" id="s85" data-tag="J1 · Course Cards">
+    <main class="inner">
+      <code class="tpl-label a">.course-page › .page-head + .course-grid4 › .course-card</code>
+      <div class="page-head a">
+        <p class="tag">01 / Ciudad</p>
+        <h1>Wenzhou hoy</h1>
+        <p class="sub">Una ciudad con rio, trabajo y vida.</p>
+      </div>
+      <div class="course-grid4">
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Rio"><div class="course-copy"><h2>Rio</h2><p>El rio es largo.<br>Hay luz suave.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Barcos"><div class="course-copy"><h2>Barcos</h2><p>Los barcos llegan.<br>La ciudad se mueve.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Taller"><div class="course-copy"><h2>Taller</h2><p>La gente hace cosas.<br>Trabaja con las manos.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Calle"><div class="course-copy"><h2>Calle</h2><p>La noche tiene luz.<br>La gente camina.</p></div></article>
+      </div>
+    </main>
+  </section>
+
+  <section class="slide course-page" id="s86" data-tag="J2 · Sentence Review">
+    <main class="inner">
+      <code class="tpl-label a">.sentence-view › .sentence-panel (ArrowUp opens, ArrowDown closes)</code>
+      <div class="page-head a">
+        <p class="tag">02 / Frases</p>
+        <h1>Frases para decir</h1>
+        <p class="sub">Use the overlay for big, teacher-led review sentences.</p>
+      </div>
+      <div class="course-grid4">
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Lugar"><div class="course-copy"><h2>Lugar</h2><p>Wenzhou tiene lugares bonitos.<br>Puedo mirar y caminar.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Comida"><div class="course-copy"><h2>Comida</h2><p>La comida es caliente.<br>Me gusta probarla.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Cultura"><div class="course-copy"><h2>Cultura</h2><p>La cultura esta viva.<br>La gente toma te.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Memoria"><div class="course-copy"><h2>Memoria</h2><p>La ciudad recuerda.<br>Las fiestas vuelven.</p></div></article>
+      </div>
+    </main>
+  </section>
+
+  <section class="slide course-closing" id="s87" data-tag="J3 · Course Closing">
+    <main class="inner center">
+      <code class="tpl-label a">.course-closing › .inner.center + short CTA</code>
+      <p class="tag a" style="color:var(--primary)">Practica</p>
+      <h2 class="a">Ahora habla.</h2>
+      <p class="sub a">Pick one card, say two simple sentences, then add one detail from memory.</p>
+    </main>
+  </section>
+</div>
+
+<div class="sentence-view" id="sentenceView" aria-hidden="true">
+  <section class="sentence-panel" aria-live="polite">
+    <h2 id="sentenceTitle"></h2>
+    <ul id="sentenceList"></ul>
+  </section>
+</div>
+<button class="nav-btn prev" id="prev" aria-label="Previous">&lt;</button>
+<button class="nav-btn next" id="next" aria-label="Next">&gt;</button>
+<div class="mobile-dots" id="mobileDots" aria-label="Slides"></div>
+<div id="counter">1 / 3</div>
+<div id="progress"></div>
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  const slideTag = document.getElementById('slideTag');
+  const sentenceView = document.getElementById('sentenceView');
+  const sentenceTitle = document.getElementById('sentenceTitle');
+  const sentenceList = document.getElementById('sentenceList');
+  const mobileDots = document.getElementById('mobileDots');
+  const sentencePages = [
+    { title: 'Wenzhou hoy', lines: ['Wenzhou es una ciudad viva.', 'Tiene rio y mar.', 'La gente trabaja mucho.'] },
+    { title: 'Frases para decir', lines: ['Puedo mirar y caminar.', 'Me gusta probar la comida.', 'La cultura esta viva.'] },
+    { title: 'Ahora habla', lines: ['Elige una tarjeta.', 'Di dos frases.', 'Agrega un detalle.'] }
+  ];
+  let cur = 0;
+  mobileDots.innerHTML = slides.map((_, i) => `<button class="mobile-dot" aria-label="Slide ${i + 1}"></button>`).join('');
+  const dots = [...mobileDots.querySelectorAll('.mobile-dot')];
+  function closeSentences() {
+    sentenceView.classList.remove('visible');
+    sentenceView.setAttribute('aria-hidden', 'true');
+  }
+  function openSentences() {
+    const page = sentencePages[cur];
+    sentenceTitle.textContent = page.title;
+    sentenceList.innerHTML = page.lines.map(line => `<li>${line}</li>`).join('');
+    sentenceView.classList.add('visible');
+    sentenceView.setAttribute('aria-hidden', 'false');
+  }
+  function go(n) {
+    closeSentences();
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    const prev = cur;
+    setTimeout(() => slides[prev].classList.remove('exit'), 520);
+    cur = ((n % slides.length) + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    progress.style.width = ((cur + 1) / slides.length * 100) + '%';
+    counter.textContent = `${cur + 1} / ${slides.length}`;
+    slideTag.textContent = slides[cur].dataset.tag || '';
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === cur));
+  }
+  dots.forEach((dot, i) => dot.addEventListener('click', () => go(i)));
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowUp') { e.preventDefault(); openSentences(); return }
+    if (e.key === 'ArrowDown') { e.preventDefault(); closeSentences(); return }
+    if (sentenceView.classList.contains('visible')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1) }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1) }
+  });
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 48) go(dx < 0 ? cur + 1 : cur - 1);
+  });
+  progress.style.width = (1 / slides.length * 100) + '%';
+  dots[0].classList.add('active');
+</script>
+</body>
+</html>

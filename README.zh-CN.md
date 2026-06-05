@@ -11,12 +11,12 @@
 | 技能 | 触发词 | 功能 |
 |------|--------|------|
 | `deep-analysis` | *"Analyze the motion..."* | 对 BP 辩题进行战略性多层分析（利益相关方、冲突点、论点） |
-| `slidegen` | *"Generate a slide deck on…"* | 生成带有品牌标识的 HTML 演示、辩题资料包、活动主持稿、经验分享演示或邀请函 |
+| `slidegen` | *"Generate a slide deck on…"* | 生成带有品牌标识的 HTML 演示、辩题资料包、活动主持稿、经验分享演示、极简演示、语言课程材料或邀请函 |
 | `imagegen` | *"Generate an illustration for…"* | 通过 Gemini API 生成 BPDU 扁平卡通风格的插画 |
 
 ## 输出规格
 
-生成的幻灯片演示都是**单个 `.html` 文件**（使用 CDN 素材时约 20–80 KB），具备：
+生成的幻灯片演示都是**单个 `.html` 文件**（典型 CDN 演示约 20–80 KB），具备：
 - 键盘导航（`←` `→` `Space`）和触摸滑动
 - 幻灯片计数器与进度条
 - 每页固定 BPDU 品牌栏
@@ -126,6 +126,8 @@ python3 skills/slidegen/scripts/embed-images.py
 | **Case File（辩题资料）** | 辩题简报、论点卡片、冲突分析 | 约 30–60 KB |
 | **Event Host（活动主持）** | 现场投影、每页一个要点、大字体 | 约 15–30 KB |
 | **Experience Sharing（经验分享）** | 工作坊、个人分享、故事型演示、QR 联系页 | 约 30–60 KB |
+| **Simplicity（极简演示）** | 深色极简演示、关键词标签、快速介绍 | 约 15–30 KB |
+| **Language Course（语言课程）** | 词汇模块、双语课程、图片卡片课程页 | 视素材而定 |
 | **Invitation / Email（邀请函）** | HTML 邮件邀请评委、嘉宾、参赛者 | 约 15–25 KB |
 
 ## 使用方法
@@ -146,6 +148,14 @@ Generate an event host deck for our weekly round on May 23
 
 ```
 Generate an experience sharing deck about my IELTS journey
+```
+
+```
+Generate a simplicity deck for a quick icebreaker on curiosity
+```
+
+```
+Generate a Spanish language course artifact about Wenzhou weather
 ```
 
 ```
@@ -178,7 +188,9 @@ BPDU 视觉识别系统采用：
 
 - **自然语言自动路由：** `slidegen` 现在可从普通用户提示中推断输出类型、速度模式，以及辩论/通用领域。
 - **Experience Sharing 演示类型：** 新增适合工作坊、个人分享、故事型演示、成绩页、活动推广卡片和 QR 联系页的温暖个人展示工作流。
-- **扩展模板库：** 模板重组为 `group-a.html` 至 `group-i.html`；当前目录包含 85 个渲染模板块。
+- **Simplicity 极简演示类型：** 新增深色极简工作流，包含手写风标题、居中大字号问题文本和关键词标签。
+- **Language Course 语言课程类型：** 新增课程/词汇模板，包含图片卡片、双语或目标语言句子练习、移动端圆点导航和句子复习浮层。
+- **扩展模板库：** 模板重组为 `group-a.html` 至 `group-j.html`；当前目录包含 88 个渲染模板块。
 - **辩论策略集成：** 新增 `debate-strategy.md`，并加入 BP 策略指南、备赛策略、PM 发言和下院策略约束的路由规则。
 - **内容完整性工作流：** 新增 Phase 0 内容简报、锁定简报规则，以及防止为了控制页数而丢弃论点或证据的约束。
 - **规范邮件骨架：** 将邀请邮件结构移入 `skills/slidegen/email-skeleton.html`，便于复用。
@@ -199,7 +211,7 @@ BPDU 视觉识别系统采用：
 
 - 初始技能集：`slidegen`、`deep-analysis`、`slide-theme`、`slide-export-tips`、`imagegen`。
 - Base64 嵌入品牌图片，实现完全自包含的离线演示。
-- 早期 `slide-templates.html` 模板库；当前目录包含 85 个渲染模板块。
+- 早期 `slide-templates.html` 模板库；当前目录包含 88 个渲染模板块。
 
 ---
 

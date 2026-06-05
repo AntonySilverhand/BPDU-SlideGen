@@ -11,12 +11,12 @@ Think PowerPoint, but in HTML — keyboard-navigable, no build step, and easy to
 | Skill | Trigger | What it does |
 |-------|---------|--------------|
 | `deep-analysis` | *"Analyze the motion..."* | Strategic, layered analysis of a BP motion (stakeholders, clashes, cases) |
-| `slidegen` | *"Generate a slide deck on…"* | Produces a branded HTML presentation, case file, event host deck, experience sharing deck, or invitation email |
+| `slidegen` | *"Generate a slide deck on…"* | Produces a branded HTML presentation, case file, event host deck, experience sharing deck, simplicity deck, language course artifact, or invitation email |
 | `imagegen` | *"Generate an illustration for…"* | Creates or edits images via the Gemini API in the BPDU flat-cartoon style |
 
 ## Output
 
-Generated slide decks are **single `.html` files** (~20–80 KB with CDN assets) with:
+Generated slide decks are **single `.html` files** (typical CDN decks are ~20–80 KB) with:
 - Keyboard navigation (`←` `→` `Space`) and touch swipe
 - Slide counter and progress bar
 - Fixed BPDU brand bar on every slide
@@ -126,6 +126,8 @@ python3 skills/slidegen/scripts/embed-images.py
 | **Case File** | Motion briefing, argument cards, clash analysis | ~30–60 KB |
 | **Event Host** | Live projection, one idea per slide, massive text | ~15–30 KB |
 | **Experience Sharing** | Workshops, personal talks, storytelling, QR contact slides | ~30–60 KB |
+| **Simplicity** | Ultra-minimal dark decks, keyword chips, quick intros | ~15–30 KB |
+| **Language Course** | Vocabulary modules, bilingual lessons, image-card course pages | varies |
 | **Invitation / Email** | HTML email invites for panelists, judges, guests | ~15–25 KB |
 
 ## Usage
@@ -146,6 +148,14 @@ Generate an event host deck for our weekly round on May 23
 
 ```
 Generate an experience sharing deck about my IELTS journey
+```
+
+```
+Generate a simplicity deck for a quick icebreaker on curiosity
+```
+
+```
+Generate a Spanish language course artifact about Wenzhou weather
 ```
 
 ```
@@ -178,7 +188,9 @@ Full spec in [`CLAUDE.md`](./CLAUDE.md).
 
 - **Natural-language auto-routing:** `slidegen` now infers output type, speed mode, and debate/general domain from normal user prompts.
 - **Experience Sharing deck type:** Added a warm personal-presentation workflow for workshops, talks, storytelling decks, score slides, promo cards, and QR contact endings.
-- **Expanded template library:** Reorganized templates into `group-a.html` through `group-i.html`; the current catalog has 85 rendered blocks.
+- **Simplicity deck type:** Added an ultra-minimal dark deck workflow with handwritten hero titles, massive centered question text, and keyword chips.
+- **Language Course Artifact deck type:** Added course/vocabulary templates with image cards, bilingual or target-language sentence practice, mobile dots, and a sentence-review overlay.
+- **Expanded template library:** Reorganized templates into `group-a.html` through `group-j.html`; the current catalog has 88 rendered blocks.
 - **Debate strategy integration:** Added `debate-strategy.md` and routing rules for BP strategy guides, prep strategy, PM speeches, and closing-bench constraints.
 - **Content completeness workflow:** Added Phase 0 brief generation, locked-brief rules, and stronger safeguards against dropping arguments or evidence to fit slide counts.
 - **Canonical email skeleton:** Moved invitation email structure into `skills/slidegen/email-skeleton.html` for reuse.
@@ -199,7 +211,7 @@ Full spec in [`CLAUDE.md`](./CLAUDE.md).
 
 - Initial skill set with `slidegen`, `deep-analysis`, `slide-theme`, `slide-export-tips`, and `imagegen`.
 - Base64-embedded brand images for fully self-contained offline decks.
-- Earlier template library for `slide-templates.html`; the current catalog has 85 rendered blocks.
+- Earlier template library for `slide-templates.html`; the current catalog has 88 rendered blocks.
 
 ---
 

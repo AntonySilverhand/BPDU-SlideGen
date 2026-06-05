@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* ═══════════════════════════════════════════
        DESIGN TOKENS
@@ -1152,6 +1153,66 @@
     }
 
     /* ═══════════════════════════════════════════
+       LANGUAGE COURSE ARTIFACT — IMAGE CARDS + SENTENCE REVIEW
+    ═══════════════════════════════════════════ */
+    .course-page {
+      --font-display: 'Cardo', Georgia, serif; --font-body: 'Inter', system-ui, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(250,250,225,.72), rgba(255,255,255,.94)),
+        radial-gradient(circle at 88% 18%, rgba(245,194,48,.18), transparent 28%),
+        radial-gradient(circle at 8% 82%, rgba(123,220,181,.18), transparent 24%);
+      font-family: var(--font-body);
+    }
+    .course-page .page-head {
+      display: grid; grid-template-columns: 1fr auto; column-gap: clamp(18px,3vw,32px);
+      align-items: end; border-bottom: 1px solid var(--border);
+      padding-bottom: clamp(10px,1.6vh,18px);
+    }
+    .course-page h1, .course-page h2, .course-closing h2 {
+      font-family: var(--font-display); letter-spacing: 0;
+    }
+    .course-grid4 {
+      display: grid; grid-template-columns: repeat(4,minmax(0,1fr));
+      gap: clamp(12px,1.6vw,22px);
+    }
+    .course-card {
+      min-width: 0; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden; box-shadow: 0 18px 45px rgba(36,33,33,.08);
+      display: flex; flex-direction: column;
+    }
+    .course-card img {
+      width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block;
+      border-bottom: 1px solid var(--border); background: #FAFAE1;
+    }
+    .course-copy { padding: clamp(12px,1.4vw,18px) }
+    .course-copy p { color: var(--muted); font-size: clamp(.78rem,1.05vw,.98rem); line-height: 1.42 }
+    .sentence-view-demo {
+      width: min(900px,92vw); border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border); padding: clamp(28px,6vh,64px) 0;
+      margin-top: clamp(18px,3vh,30px);
+    }
+    .sentence-view-demo h2 {
+      font-family: 'Cardo', Georgia, serif; font-size: clamp(2rem,5vw,5rem);
+      line-height: 1; margin-bottom: clamp(22px,4vh,38px);
+    }
+    .sentence-view-demo ul { list-style: none; display: grid; gap: clamp(14px,2.5vh,24px) }
+    .sentence-view-demo li {
+      font-size: clamp(1.3rem,3vw,2.6rem); line-height: 1.25;
+      padding-left: clamp(18px,3vw,32px); border-left: clamp(4px,.6vw,6px) solid var(--primary);
+    }
+    .course-closing {
+      background: var(--bg-dark); color: white;
+      background-image: radial-gradient(circle at 20% 20%, rgba(245,194,48,.16), transparent 30%);
+    }
+    .course-closing h2 { font-size: clamp(2.4rem,6vw,6rem); color: white }
+    .course-closing .sub { color: rgba(255,255,255,.62) }
+    @media (max-width: 900px) {
+      .course-page .page-head { display: block }
+      .course-grid4 { grid-template-columns: 1fr 1fr }
+    }
+    @media (max-width: 560px) { .course-grid4 { grid-template-columns: 1fr } }
+
+    /* ═══════════════════════════════════════════
        SLIDE BACKGROUNDS
     ═══════════════════════════════════════════ */
 
@@ -1298,6 +1359,9 @@
     #s70 { background: white           } /* Split Hero */
     #s71 { background: var(--bg-warm)  } /* Floating Shadow Cards */
     #s72 { background: var(--bg-dark)  } /* Summary Grid */
+    #s85 { background: var(--bg-warm)  } /* Course Cards */
+    #s86 { background: var(--bg-warm)  } /* Sentence Review */
+    #s87 { background: var(--bg-dark)  } /* Course Closing */
 
     /* ═══════════════════════════════════════════
        EXPERIENCE SHARING — ELEGANT DECK COMPONENTS
@@ -1621,11 +1685,11 @@
   <span class="brand-bar-name">BP Debate Union</span>
   <span class="brand-bar-dot"></span>
   <span class="brand-bar-slide-tag" id="slideTag">Template Library</span>
-  <span class="lib-badge">Design Library · 84 Blocks</span>
+  <span class="lib-badge">Design Library · 88 Blocks</span>
 </header>
 
 <div id="progress"></div>
-<span id="counter">1 / 84</span>
+<span id="counter">1 / 88</span>
 <button class="nav-btn prev" onclick="go(cur-1)">&#8592;</button>
 <button class="nav-btn next" onclick="go(cur+1)">&#8594;</button>
 <div class="key-hint"><kbd>&#8592;</kbd><kbd>&#8594;</kbd> navigate &nbsp;·&nbsp; <kbd>Space</kbd> advance</div>
@@ -3686,6 +3750,63 @@
       <div class="gold-divider reveal stagger-4" style="margin:0 auto"><div class="diamond"></div></div>
       <p class="promo-footer reveal stagger-5">"Where logic clashes, minds meet, ideas matter…"</p>
     </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       J1 · Course Cards
+       .course-page › .page-head + .course-grid4 › .course-card
+  ══════════════════════════════════════════ -->
+  <section class="slide course-page" id="s85" data-tag="J1 · Course Cards">
+    <main class="inner">
+      <code class="tpl-label a">.course-page › .page-head + .course-grid4 › .course-card</code>
+      <div class="page-head a">
+        <p class="tag">01 / Ciudad</p>
+        <h1>Wenzhou hoy</h1>
+        <p class="sub">Una ciudad con rio, trabajo y vida.</p>
+      </div>
+      <div class="course-grid4">
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Rio"><div class="course-copy"><h2>Rio</h2><p>El rio es largo.<br>Hay luz suave.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Barcos"><div class="course-copy"><h2>Barcos</h2><p>Los barcos llegan.<br>La ciudad se mueve.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Taller"><div class="course-copy"><h2>Taller</h2><p>La gente hace cosas.<br>Trabaja con las manos.</p></div></article>
+        <article class="course-card a"><img src="BPDU_theme_image.png" alt="Calle"><div class="course-copy"><h2>Calle</h2><p>La noche tiene luz.<br>La gente camina.</p></div></article>
+      </div>
+    </main>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       J2 · Sentence Review
+       .sentence-view-demo › h2 + ul review lines
+  ══════════════════════════════════════════ -->
+  <section class="slide course-page" id="s86" data-tag="J2 · Sentence Review">
+    <main class="inner">
+      <code class="tpl-label a">.sentence-view-demo › h2 + ul review lines</code>
+      <div class="page-head a">
+        <p class="tag">02 / Frases</p>
+        <h1>Frases para decir</h1>
+        <p class="sub">A full deck uses this as an overlay opened with ArrowUp.</p>
+      </div>
+      <section class="sentence-view-demo a" aria-label="Sentence review example">
+        <h2>Wenzhou hoy</h2>
+        <ul>
+          <li>Wenzhou es una ciudad viva.</li>
+          <li>Tiene rio y mar.</li>
+          <li>La gente trabaja mucho.</li>
+        </ul>
+      </section>
+    </main>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       J3 · Course Closing
+       .course-closing › .inner.center + short CTA
+  ══════════════════════════════════════════ -->
+  <section class="slide course-closing" id="s87" data-tag="J3 · Course Closing">
+    <main class="inner center">
+      <code class="tpl-label on-dark a">.course-closing › .inner.center + short CTA</code>
+      <p class="tag a" style="color:var(--primary)">Practica</p>
+      <h2 class="a">Ahora habla.</h2>
+      <p class="sub a">Pick one card, say two simple sentences, then add one detail from memory.</p>
+    </main>
   </section>
 
 </div><!-- /.deck -->
