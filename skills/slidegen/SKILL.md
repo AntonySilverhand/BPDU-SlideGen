@@ -194,6 +194,17 @@ The following A4 print-ready HTML poster/flyer templates are available as canoni
 
 When generating new event flyers or posters, read the relevant template file first to copy its CSS tokens, layout patterns, and bilingual text styling verbatim. Do not invent new class names for poster layouts.
 
+### Live Reference Decks
+
+These live-deployed decks are canonical reference implementations. When the agent needs inspiration for a specific deck type, read these URLs via WebFetch to study their CSS, layout, and content patterns before generating.
+
+| Deck | URL | Type | Description |
+|------|-----|------|-------------|
+| **BPDU Annual Audit** | `https://bpdebate.club/bpdu-annual-audit/` | Reference / Report | Organizational annual report deck with stats, charts, and narrative slides |
+| **Apex Legends en Español** | `https://antony.bpdebate.club/spanish-course-artifacts/apex-legends-en-espanol-v2.html` | Language Course Artifact | Gaming-themed Spanish vocabulary deck with image cards and sentence review overlay |
+| **Wenzhou en Español** | `https://antony.bpdebate.club/spanish-course-artifacts/wenzhou-en-espanol.html` | Language Course Artifact | City/culture Spanish primer — the canonical Language Course Artifact reference |
+| **Cangnan Qingming (English)** | `https://antony.bpdebate.club/spanish-course-artifacts/cangnan-qingming-en.html` | Language Course Artifact | Cultural festival bilingual deck with image vocabulary cards and English sentences |
+
 ## Invitation Letter / Email Templates
 
 Branded HTML emails for inviting panelists, judges, guests, or participants to BPDU events. Designed for maximum compatibility across email clients using **table-based layout with inline CSS**.
@@ -241,7 +252,7 @@ Save invitation letters to `tmp/` with a descriptive name, e.g. `tmp/invite-[eve
 - **Meet the Teachers**: Public-facing guest event style. Blends theatrical projection with informative biographies and concept breakdowns.
 - **Experience Sharing**: Elegant personal-presentation style. Warm cream backgrounds (`var(--bg-warm)`), editorial serif feel (`'Lora'`), generous whitespace, floating decorative shapes, reveal animations with stagger. Designed for talks, workshops, and storytelling — one idea per slide, tip cards for advice, score cards for metrics, promo cards for CTAs, QR cards for contact. Always uses `__THEME_URI__` on title and closing slides with `.illo` / `.closing-illo`.
 - **Simplicity**: Ultra-minimal dark deck. Handwritten hero title (`'Beth Ellen'` cursive), massive centered question text, keyword chips with `.min-keyword` / `.min-keyword.hl`. No cards, no grids, no complex layouts. Background: `var(--bg-dark)` on every slide. Brand bar dark variant.
-- **Language Course Artifact**: Compact learning deck based on `wenzhou-en-espanol.html`: warm paper background, `Cardo` serif headings, `Inter` body, `.page-head` plus `.course-grid4` image vocabulary cards, mobile dot navigation, and optional `.sentence-view` overlay for review sentences. Use this for Spanish/course artifacts, vocabulary modules, city/culture primers, and simple bilingual lessons.
+- **Language Course Artifact**: Compact learning deck based on [Wenzhou en Español](https://antony.bpdebate.club/spanish-course-artifacts/wenzhou-en-espanol.html) (canonical reference). See also [Apex Legends en Español](https://antony.bpdebate.club/spanish-course-artifacts/apex-legends-en-espanol-v2.html) and [Cangnan Qingming](https://antony.bpdebate.club/spanish-course-artifacts/cangnan-qingming-en.html) for additional examples. Design: warm paper background, `Cardo` serif headings, `Inter` body, `.page-head` plus `.course-grid4` image vocabulary cards, mobile dot navigation, and optional `.sentence-view` overlay for review sentences. Use this for Spanish/course artifacts, vocabulary modules, city/culture primers, and simple bilingual lessons.
 
 ### Mandatory Brand Bar HTML
 ```html
